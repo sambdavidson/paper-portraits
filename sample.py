@@ -1,7 +1,7 @@
 import face_recognition
 
-image = face_recognition.load_image_file("obama.jpg")
+image = face_recognition.load_image_file("sample/obama.jpg")
 
 face_locations = face_recognitions.face_locations(image)
 
-print face_locations[0]
+print(face_locations[0])
