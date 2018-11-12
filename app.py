@@ -3,7 +3,7 @@ import face_recognition
 import subprocess
 import sys
 
-capture_path = "sample/capture.jpg"
+capture_path = "sample/capture.png"
 output_path = "sample/face.png"
 
 ERROR_LIMIT = 10
@@ -75,7 +75,7 @@ def capture_image_to_path(path):
     retry = True
     while retry:
         try:
-            subprocess.run(['fswebcam', '-r', '320x240', '-q', '--no-banner', '--save', path], check=True)
+            subprocess.run(['fswebcam', '-r', '320x240', '-q', '--no-banner', '--png', '--save', path], check=True)
             retry = False
         except subprocess.CalledProcessError as e:
             error(e)
