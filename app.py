@@ -86,7 +86,7 @@ def set_drawn_image(path):
     retry = True
     while retry:
         try:
-            subprocess.run(['fbi', '-T', '2', '-a', output_image], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            subprocess.run(['fbi', '-T', '2', '-a', path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
             retry = False
         except subprocess.CalledProcessError as e:
             error(e)
