@@ -33,6 +33,7 @@ def loop():
 
 # Captures image from webcam and saves to the specified path
 def capture_image_to_path(path):
+    print('capture_image_to_path')
     try:
         subprocess.run(['fswebcam', '-r', '640x480', '--no-banner', '--save', path], check=True)
     except subprocess.CalledProcessError as e:
