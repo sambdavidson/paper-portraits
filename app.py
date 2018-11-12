@@ -33,27 +33,35 @@ def loop():
     pil_image = Image.new('RGBA', capture_image.size, color=(255, 255, 255, 255))
     d = ImageDraw.Draw(pil_image, 'RGBA')
 
+    # Colors
+    black = (0, 0, 0, 255)
+
     # Make the eyebrows into a nightmare
-    brow_fill = (0, 0, 0, 128)
-    brow_line = (0, 0, 0, 150)
+    brow_fill = black
+    brow_line = black
     d.polygon(face_landmarks['left_eyebrow'], fill=brow_fill)
     d.polygon(face_landmarks['right_eyebrow'], fill=brow_fill)
-    d.line(face_landmarks['left_eyebrow'], fill=brow_line, width=5)
-    d.line(face_landmarks['right_eyebrow'], fill=brow_line, width=5)
+    d.line(face_landmarks['left_eyebrow'], fill=brow_line, width=2)
+    d.line(face_landmarks['right_eyebrow'], fill=brow_line, width=2)
 
-    # Gloss the lips
-    lip_fill = (0, 0, 0, 128)
-    lip_line = (0, 0, 0, 64)
+    # Lips
+    lip_fill = (100, 100, 100, 255)
+    lip_line = black
     d.polygon(face_landmarks['top_lip'], fill=lip_fill)
     d.polygon(face_landmarks['bottom_lip'], fill=lip_fill)
-    d.line(face_landmarks['top_lip'], fill=lip_line, width=8)
-    d.line(face_landmarks['bottom_lip'], fill=lip_line, width=8)
+    d.line(face_landmarks['top_lip'], fill=lip_line, width=2)
+    d.line(face_landmarks['bottom_lip'], fill=lip_line, width=2)
 
-    # # Sparkle the eyes
-    # eye_fill = (255, 255, 255, 30)
-    # d.polygon(face_landmarks['left_eye'], fill=eye_fill)
-    # d.polygon(face_landmarks['right_eye'], fill=eye_fill)
-    #
+    # Eyes
+    eye_fill = black
+    d.polygon(face_landmarks['left_eye'], fill=eye_fill)
+    d.polygon(face_landmarks['right_eye'], fill=eye_fill)
+
+    # Nose
+    nose_fill = black
+    d.polygon(face_landmarks['nose_tip'], fill=nose_fill)
+    d.polygon(face_landmarks['nose_bridge'], fill=nose_fill)
+
     # # Apply some eyeliner
     # d.line(face_landmarks['left_eye'] + [face_landmarks['left_eye'][0]], fill=(0, 0, 0, 110), width=6)
     # d.line(face_landmarks['right_eye'] + [face_landmarks['right_eye'][0]], fill=(0, 0, 0, 110), width=6)
