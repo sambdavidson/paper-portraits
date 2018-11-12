@@ -28,7 +28,8 @@ def loop():
     face_location = face_locations[0]
     face_landmarks = face_landmarks_list[0]
     capture_image = Image.fromarray(image)
-    pil_image = Image.new('RGBA', capture_image.size, color=(255, 255, 255, 255))
+    pil_image = capture_image
+    # pil_image = Image.new('RGBA', capture_image.size, color=(255, 255, 255, 255))
     d = ImageDraw.Draw(pil_image, 'RGBA')
 
     # Colors
