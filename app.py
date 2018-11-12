@@ -3,8 +3,8 @@ import face_recognition
 import subprocess
 import sys
 
-output_image = "sample/face.png"
 capture_path = "sample/capture.jpg"
+output_path = "sample/face.png"
 
 ERROR_LIMIT = 10
 error_count = 0
@@ -65,8 +65,8 @@ def loop():
     # d.line(face_landmarks['right_eye'] + [face_landmarks['right_eye'][0]], fill=(0, 0, 0, 110), width=6)
 
     face = pil_image.crop((face_location[3], face_location[0], face_location[1], face_location[2]))
-    face.save(output_image)
-    set_drawn_image(output_image)
+    face.save(output_path)
+    set_drawn_image(output_path)
 
 
 # Captures image from webcam and saves to the specified path
