@@ -1,5 +1,4 @@
-from PIL import Image
-from shutil import copyfile
+from PIL import Image, ImageDraw
 import face_recognition
 import subprocess
 import sys
@@ -17,20 +16,46 @@ fbi_pid = None
 def loop():
     reset_error_count()
     capture_image_to_path(capture_path)
-    real_image = Image.open(input_image)
-    numpy_image = face_recognition.load_image_file(input_image)
-    face_locations = face_recognition.face_locations(numpy_image)
-    if len(face_locations) > 0:
-        up = face_locations[0][0]
-        down = face_locations[0][2]
-        left = face_locations[0][3]
-        right = face_locations[0][1]
-        face = real_image.crop((left, up, right, down))
-        face.save(output_image)
-        print("Drawing face!", output_image)
-        set_drawn_image(output_image)
-    else:
-        print("No faces found")
+    image = face_recognition.load_image_file(input_image)
+    face_locations = face_recognition.face_locations(image)
+
+    if len(face_locations) == 0:
+        print('No face found')
+        return
+
+    face_landmarks_list = face_recognition.face_landmarks(image, face_locations=face_locations[:1])
+
+    if len(face_landmarks_list) == 0:
+        print('No landmarks for found face')
+        return
+    face_location = face_locations[0]
+    face_landmarks = face_landmarks_list[0]
+    pil_image = Image.fromarray(image)
+    d = ImageDraw.Draw(pil_image, 'RGBA')
+
+    # Make the eyebrows into a nightmare
+    d.polygon(face_landmarks['left_eyebrow'], fill=(68, 54, 39, 128))
+    d.polygon(face_landmarks['right_eyebrow'], fill=(68, 54, 39, 128))
+    d.line(face_landmarks['left_eyebrow'], fill=(68, 54, 39, 150), width=5)
+    d.line(face_landmarks['right_eyebrow'], fill=(68, 54, 39, 150), width=5)
+
+    # Gloss the lips
+    d.polygon(face_landmarks['top_lip'], fill=(150, 0, 0, 128))
+    d.polygon(face_landmarks['bottom_lip'], fill=(150, 0, 0, 128))
+    d.line(face_landmarks['top_lip'], fill=(150, 0, 0, 64), width=8)
+    d.line(face_landmarks['bottom_lip'], fill=(150, 0, 0, 64), width=8)
+
+    # Sparkle the eyes
+    d.polygon(face_landmarks['left_eye'], fill=(255, 255, 255, 30))
+    d.polygon(face_landmarks['right_eye'], fill=(255, 255, 255, 30))
+
+    # Apply some eyeliner
+    d.line(face_landmarks['left_eye'] + [face_landmarks['left_eye'][0]], fill=(0, 0, 0, 110), width=6)
+    d.line(face_landmarks['right_eye'] + [face_landmarks['right_eye'][0]], fill=(0, 0, 0, 110), width=6)
+
+    face = pil_image.crop((face_location[3], face_location[0], face_location[1], face_location[2]))
+    face.save(output_image)
+    set_drawn_image(output_image)
 
 
 # Captures image from webcam and saves to the specified path
@@ -70,4 +95,5 @@ def error(e):
 
 
 while True:
+    print('Running main loop...')
     loop()
