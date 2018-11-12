@@ -38,7 +38,7 @@ def capture_image_to_path(path):
     retry = True
     while retry:
         try:
-            subprocess.run(['fswebcam', '-r', '640x480', '--no-banner', '--save', path], check=True)
+            subprocess.run(['fswebcam', '-r', '320x240', '-q', '--no-banner', '--save', path], check=True)
             retry = False
         except subprocess.CalledProcessError as e:
             error(e)
