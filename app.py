@@ -3,9 +3,7 @@ import face_recognition
 import subprocess
 import sys
 
-input_image = "sample/capture.jpg"
-output_image = "sample/face.jpg"
-
+output_image = "sample/face.png"
 capture_path = "sample/capture.jpg"
 
 ERROR_LIMIT = 10
@@ -16,7 +14,7 @@ fbi_pid = None
 def loop():
     reset_error_count()
     capture_image_to_path(capture_path)
-    image = face_recognition.load_image_file(input_image)
+    image = face_recognition.load_image_file(capture_path)
     face_locations = face_recognition.face_locations(image)
 
     if len(face_locations) == 0:
