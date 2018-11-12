@@ -11,6 +11,7 @@ capture_path = "sample/capture.jpg"
 
 ERROR_LIMIT = 10
 error_count = 0
+fbi_pid = None
 
 
 def loop():
@@ -27,16 +28,32 @@ def loop():
         face = real_image.crop((left, up, right, down))
         face.save(output_image)
         print("Drawing face!", output_image)
-        subprocess.run(['fbi', '-T', '2', '-a', output_image])
+        set_drawn_image(output_image)
     else:
         print("No faces found")
 
+
 # Captures image from webcam and saves to the specified path
 def capture_image_to_path(path):
-    try:
-        subprocess.run(['fswebcam', '-r', '640x480', '--no-banner', '--save', path], check=True)
-    except subprocess.CalledProcessError as e:
-        error(e)
+    retry = True
+    while retry:
+        try:
+            subprocess.run(['fswebcam', '-r', '640x480', '--no-banner', '--save', path], check=True)
+            retry = False
+        except subprocess.CalledProcessError as e:
+            error(e)
+
+
+# Set drawn image
+def set_drawn_image(path):
+    subprocess.run(['killall', 'fbi'])
+    retry = True
+    while retry:
+        try:
+            subprocess.run(['fbi', '-T', '2', '-a', output_image], check=True)
+            retry = False
+        except subprocess.CalledProcessError as e:
+            error(e)
 
 
 def reset_error_count():
