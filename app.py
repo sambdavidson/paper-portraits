@@ -2,32 +2,39 @@ from PIL import Image, ImageDraw
 import face_recognition
 import subprocess
 import sys
+import numpy
 
 capture_path = "sample/capture.png"
 output_path = "sample/face.png"
 
 ERROR_LIMIT = 10
 error_count = 0
-fbi_pid = None
+capture_image_width = 1920
+capture_image_height = 1080
+face_image_scale = 0.25
 
 
 def loop():
+    global capture_image_width, capture_image_height, face_image_scale
     reset_error_count()
     capture_image_to_path(capture_path)
-    image = face_recognition.load_image_file(capture_path)
-    face_locations = face_recognition.face_locations(image)
+    pil_image = Image.open(capture_path)
+    numpy_image = numpy.array(pil_image.resize([capture_image_width * face_image_scale,
+                                                capture_image_height * face_image_scale]))
+    face_locations = face_recognition.face_locations(numpy_image)
 
     if len(face_locations) == 0:
         return
 
-    face_landmarks_list = face_recognition.face_landmarks(image, face_locations=face_locations[:1])
+    face_landmarks_list = face_recognition.face_landmarks(numpy_image, face_locations=face_locations[:1])
 
     if len(face_landmarks_list) == 0:
         print('No landmarks for found face')
         return
+
     face_location = face_locations[0]
     face_landmarks = face_landmarks_list[0]
-    capture_image = Image.fromarray(image)
+    capture_image = Image.fromarray(numpy_image)
     pil_image = capture_image
     # pil_image = Image.new('RGBA', capture_image.size, color=(255, 255, 255, 255))
     d = ImageDraw.Draw(pil_image, 'RGBA')
@@ -65,17 +72,22 @@ def loop():
     # d.line(face_landmarks['left_eye'] + [face_landmarks['left_eye'][0]], fill=(0, 0, 0, 110), width=6)
     # d.line(face_landmarks['right_eye'] + [face_landmarks['right_eye'][0]], fill=(0, 0, 0, 110), width=6)
 
-    face = pil_image.crop((face_location[3], face_location[0], face_location[1], face_location[2]))
+    face = pil_image.crop((face_location[3] / face_image_scale,
+                           face_location[0] / face_image_scale,
+                           face_location[1] / face_image_scale,
+                           face_location[2] / face_image_scale))
     face.save(output_path)
     set_drawn_image(output_path)
 
 
 # Captures image from webcam and saves to the specified path
 def capture_image_to_path(path):
+    global capture_image_width, capture_image_height
     retry = True
     while retry:
         try:
-            subprocess.run(['fswebcam', '-r', '320x240', '-q', '--no-banner', '--png', '--save', path], check=True)
+            subprocess.run(['fswebcam', '-r', '{}x{}'.format(capture_image_width, capture_image_height), '-q',
+                            '--no-banner', '--png', '--save', path], check=True)
             retry = False
         except subprocess.CalledProcessError as e:
             error(e)
