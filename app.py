@@ -37,36 +37,36 @@ def loop():
     capture_image = Image.fromarray(numpy_image)
     pil_image = capture_image
     # pil_image = Image.new('RGBA', capture_image.size, color=(255, 255, 255, 255))
-    d = ImageDraw.Draw(pil_image, 'RGBA')
+    # d = ImageDraw.Draw(pil_image, 'RGBA')
 
     # Colors
-    black = (0, 0, 0, 255)
+    # black = (0, 0, 0, 255)
 
     # Make the eyebrows into a nightmare
-    brow_fill = black
-    brow_line = black
-    d.polygon(face_landmarks['left_eyebrow'], fill=brow_fill)
-    d.polygon(face_landmarks['right_eyebrow'], fill=brow_fill)
-    d.line(face_landmarks['left_eyebrow'], fill=brow_line, width=2)
-    d.line(face_landmarks['right_eyebrow'], fill=brow_line, width=2)
+    # brow_fill = black
+    # brow_line = black
+    # d.polygon(face_landmarks['left_eyebrow'], fill=brow_fill)
+    # d.polygon(face_landmarks['right_eyebrow'], fill=brow_fill)
+    # d.line(face_landmarks['left_eyebrow'], fill=brow_line, width=2)
+    #d.line(face_landmarks['right_eyebrow'], fill=brow_line, width=2)
 
     # Lips
-    lip_fill = (100, 100, 100, 255)
-    lip_line = black
-    d.polygon(face_landmarks['top_lip'], fill=lip_fill)
-    d.polygon(face_landmarks['bottom_lip'], fill=lip_fill)
-    d.line(face_landmarks['top_lip'], fill=lip_line, width=2)
-    d.line(face_landmarks['bottom_lip'], fill=lip_line, width=2)
+    # lip_fill = (100, 100, 100, 255)
+    # lip_line = black
+    # d.polygon(face_landmarks['top_lip'], fill=lip_fill)
+    # d.polygon(face_landmarks['bottom_lip'], fill=lip_fill)
+    #d.line(face_landmarks['top_lip'], fill=lip_line, width=2)
+    #d.line(face_landmarks['bottom_lip'], fill=lip_line, width=2)
 
     # Eyes
-    eye_fill = black
-    d.polygon(face_landmarks['left_eye'], fill=eye_fill)
-    d.polygon(face_landmarks['right_eye'], fill=eye_fill)
+    # eye_fill = black
+    # d.polygon(face_landmarks['left_eye'], fill=eye_fill)
+    # d.polygon(face_landmarks['right_eye'], fill=eye_fill)
 
     # Nose
-    nose_fill = black
-    d.polygon(face_landmarks['nose_tip'], fill=nose_fill)
-    d.polygon(face_landmarks['nose_bridge'], fill=nose_fill)
+    # nose_fill = black
+    # d.polygon(face_landmarks['nose_tip'], fill=nose_fill)
+    # d.polygon(face_landmarks['nose_bridge'], fill=nose_fill)
 
     # # Apply some eyeliner
     # d.line(face_landmarks['left_eye'] + [face_landmarks['left_eye'][0]], fill=(0, 0, 0, 110), width=6)
@@ -77,6 +77,7 @@ def loop():
                            face_location[1] / face_image_scale,
                            face_location[2] / face_image_scale))
     face.save(output_path)
+    face.convert('1').save(output_path)
     set_drawn_image(output_path)
 
 
@@ -87,7 +88,7 @@ def capture_image_to_path(path):
     while retry:
         try:
             subprocess.run(['fswebcam', '-r', '{}x{}'.format(capture_image_width, capture_image_height), '-q',
-                            '--no-banner', '--png', '--save', path], check=True)
+                            '--no-banner', '--png', '9', '--save', path], check=True)
             retry = False
         except subprocess.CalledProcessError as e:
             error(e)
