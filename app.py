@@ -24,7 +24,7 @@ print('Initializing PiCamera')
 camera = PiCamera()
 camera.resolution = (capture_image_width, capture_image_height)
 
-def loop():
+def capture_loop():
     global capture_image_width, capture_image_height, face_image_scale, camera
     reset_error_count()
 
@@ -45,9 +45,7 @@ def loop():
         print('No landmarks for found for face location')
         return
 
-    print('editing')
     face_location = face_locations[0]
-    face_landmarks = face_landmarks_list[0]
 
     pil_face = pil_image.crop((int(face_location[3] / face_image_scale),
                            int(face_location[0] / face_image_scale),
@@ -60,41 +58,33 @@ def loop():
 
 
 def face_crop_to_epd(pil_face):
-    # Compared to EPD_WIDTH because the image will be displayed rotated 90deg
-    resize_ratio = pil_face.height / epd7in5.EPD_WIDTH
+    return crop_match_width(pil_face, epd7in5.EPD_HEIGHT, epd7in5.EPD_WIDTH).rotate(270, expand=True)
+    #return crop_match_height(pil_face, epd7in5.EPD_HEIGHT, epd7in5.EPD_WIDTH).rotate(270, expand=True)
+
+
+def crop_match_height(pil_face, width, height):
+    resize_ratio = pil_face.height / height
     resize_width = int(pil_face.width / resize_ratio)
-    resized_face = pil_face.resize((resize_width, epd7in5.EPD_WIDTH))
-    extra_width = resize_width - epd7in5.EPD_HEIGHT
-    cropped_face = resized_face.crop((extra_width/2, 0, resize_width - (extra_width/2), epd7in5.EPD_WIDTH))
-    return cropped_face.rotate(270, expand=True)
-
-# Captures image from webcam and saves to the specified path
-def capture_image_to_path(path):
-    global capture_image_width, capture_image_height
-    retry = True
-    while retry:
-        print('fswebcam start')
-        try:
-            subprocess.run(['fswebcam', '-r', '{}x{}'.format(capture_image_width, capture_image_height), '-q',
-                            '--no-banner', '--save', path], check=True)
-            print('fswebcam done')
-            retry = False
-        except subprocess.CalledProcessError as e:
-            error(e)
+    resized_face = pil_face.resize((resize_width, height))
+    extra_width = resize_width - width
+    x1 = max(min(extra_width / 2, resize_width),0)
+    y1 = 0
+    x2 = max(min(resize_width - (extra_width / 2), resize_width), 0)
+    y2 = height
+    cropped_face = resized_face.crop((x1, y1, x2, y2))
+    return cropped_face
 
 
-# Set drawn image
-def set_drawn_image(path):
-    print('killall')
-    subprocess.run(['killall', 'fbi'])
-    retry = True
-    while retry:
-        print('fbi')
-        try:
-            subprocess.run(['fbi', '-T', '2', '-a', path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-            retry = False
-        except subprocess.CalledProcessError as e:
-            error(e)
+def crop_match_width(pil_face, width, height):
+    resize_ratio = pil_face.width / width
+    resize_height = int(pil_face.height / resize_ratio)
+    resized_face = pil_face.resize((width, resize_height))
+    out_image = Image.new("RGB", (width, height), color="white")
+    extra_height = height - resize_height
+    y1 = max(min(extra_height / 2), height, 0)
+    y2 = max(min(height - (extra_height / 2), height), 0)
+    out_image.paste(resized_face, box=(0, y1, width, y2))
+    return out_image
 
 
 def reset_error_count():
@@ -111,4 +101,4 @@ def error(e):
 
 print('Running main loop...')
 while True:
-    loop()
+    capture_loop()
