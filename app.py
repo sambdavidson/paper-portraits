@@ -1,94 +1,83 @@
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
+from picamera import PiCamera
+from io import BytesIO
 import face_recognition
 import subprocess
 import sys
 import numpy
+import epd7in5
 
-capture_path = "sample/capture.png"
-output_path = "sample/face.png"
+capture_path = "sample/capture.jpg"
+output_path = "sample/face.jpg"
 
 ERROR_LIMIT = 10
 error_count = 0
-capture_image_width = 1920
-capture_image_height = 1080
-face_image_scale = 0.25
+capture_image_width = 3280
+capture_image_height = 2464
+face_image_scale = 0.125
 
+print('Initializing EPD')
+epd = epd7in5.EPD()
+epd.init()
+
+print('Initializing PiCamera')
+camera = PiCamera()
+camera.resolution = (capture_image_width, capture_image_height)
 
 def loop():
-    global capture_image_width, capture_image_height, face_image_scale
+    global capture_image_width, capture_image_height, face_image_scale, camera
     reset_error_count()
-    capture_image_to_path(capture_path)
-    pil_image = Image.open(capture_path)
-    numpy_image = numpy.array(pil_image.resize([capture_image_width * face_image_scale,
-                                                capture_image_height * face_image_scale]))
+
+    stream = BytesIO()
+    camera.capture(stream, format='jpeg')
+    stream.seek(0)
+    pil_image = Image.open(stream)
+    numpy_image = numpy.array(pil_image.resize([int(capture_image_width * face_image_scale),
+                                                int(capture_image_height * face_image_scale)]))
     face_locations = face_recognition.face_locations(numpy_image)
 
     if len(face_locations) == 0:
         return
-
+    
     face_landmarks_list = face_recognition.face_landmarks(numpy_image, face_locations=face_locations[:1])
 
     if len(face_landmarks_list) == 0:
-        print('No landmarks for found face')
+        print('No landmarks for found for face location')
         return
 
+    print('editing')
     face_location = face_locations[0]
     face_landmarks = face_landmarks_list[0]
-    capture_image = Image.fromarray(numpy_image)
-    pil_image = capture_image
-    # pil_image = Image.new('RGBA', capture_image.size, color=(255, 255, 255, 255))
-    # d = ImageDraw.Draw(pil_image, 'RGBA')
 
-    # Colors
-    # black = (0, 0, 0, 255)
+    pil_face = pil_image.crop((int(face_location[3] / face_image_scale),
+                           int(face_location[0] / face_image_scale),
+                           int(face_location[1] / face_image_scale),
+                           int(face_location[2] / face_image_scale)))
 
-    # Make the eyebrows into a nightmare
-    # brow_fill = black
-    # brow_line = black
-    # d.polygon(face_landmarks['left_eyebrow'], fill=brow_fill)
-    # d.polygon(face_landmarks['right_eyebrow'], fill=brow_fill)
-    # d.line(face_landmarks['left_eyebrow'], fill=brow_line, width=2)
-    #d.line(face_landmarks['right_eyebrow'], fill=brow_line, width=2)
+    displayed_face = face_crop_to_epd(pil_face)
+    print('render')
+    epd.display_frame(epd.get_frame_buffer(displayed_face))
 
-    # Lips
-    # lip_fill = (100, 100, 100, 255)
-    # lip_line = black
-    # d.polygon(face_landmarks['top_lip'], fill=lip_fill)
-    # d.polygon(face_landmarks['bottom_lip'], fill=lip_fill)
-    #d.line(face_landmarks['top_lip'], fill=lip_line, width=2)
-    #d.line(face_landmarks['bottom_lip'], fill=lip_line, width=2)
 
-    # Eyes
-    # eye_fill = black
-    # d.polygon(face_landmarks['left_eye'], fill=eye_fill)
-    # d.polygon(face_landmarks['right_eye'], fill=eye_fill)
-
-    # Nose
-    # nose_fill = black
-    # d.polygon(face_landmarks['nose_tip'], fill=nose_fill)
-    # d.polygon(face_landmarks['nose_bridge'], fill=nose_fill)
-
-    # # Apply some eyeliner
-    # d.line(face_landmarks['left_eye'] + [face_landmarks['left_eye'][0]], fill=(0, 0, 0, 110), width=6)
-    # d.line(face_landmarks['right_eye'] + [face_landmarks['right_eye'][0]], fill=(0, 0, 0, 110), width=6)
-
-    face = pil_image.crop((face_location[3] / face_image_scale,
-                           face_location[0] / face_image_scale,
-                           face_location[1] / face_image_scale,
-                           face_location[2] / face_image_scale))
-    face.save(output_path)
-    face.convert('1').save(output_path)
-    set_drawn_image(output_path)
-
+def face_crop_to_epd(pil_face):
+    # Compared to EPD_WIDTH because the image will be displayed rotated 90deg
+    resize_ratio = pil_face.height / epd7in5.EPD_WIDTH
+    resize_width = int(pil_face.width / resize_ratio)
+    resized_face = pil_face.resize((resize_width, epd7in5.EPD_WIDTH))
+    extra_width = resize_width - epd7in5.EPD_HEIGHT
+    cropped_face = resized_face.crop((extra_width/2, 0, resize_width - (extra_width/2), epd7in5.EPD_WIDTH))
+    return cropped_face.rotate(270, expand=True)
 
 # Captures image from webcam and saves to the specified path
 def capture_image_to_path(path):
     global capture_image_width, capture_image_height
     retry = True
     while retry:
+        print('fswebcam start')
         try:
             subprocess.run(['fswebcam', '-r', '{}x{}'.format(capture_image_width, capture_image_height), '-q',
-                            '--no-banner', '--png', '9', '--save', path], check=True)
+                            '--no-banner', '--save', path], check=True)
+            print('fswebcam done')
             retry = False
         except subprocess.CalledProcessError as e:
             error(e)
@@ -96,9 +85,11 @@ def capture_image_to_path(path):
 
 # Set drawn image
 def set_drawn_image(path):
+    print('killall')
     subprocess.run(['killall', 'fbi'])
     retry = True
     while retry:
+        print('fbi')
         try:
             subprocess.run(['fbi', '-T', '2', '-a', path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
             retry = False
@@ -117,7 +108,6 @@ def error(e):
     error_count += 1
     if error_count == ERROR_LIMIT:
         sys.exit()
-
 
 print('Running main loop...')
 while True:
