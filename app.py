@@ -67,9 +67,9 @@ def crop_match_height(pil_face, width, height):
     resize_width = int(pil_face.width / resize_ratio)
     resized_face = pil_face.resize((resize_width, height))
     extra_width = resize_width - width
-    x1 = max(min(extra_width / 2, resize_width),0)
+    x1 = max(min(int(extra_width / 2), resize_width), 0)
     y1 = 0
-    x2 = max(min(resize_width - (extra_width / 2), resize_width), 0)
+    x2 = max(min(resize_width - int(extra_width / 2), resize_width), 0)
     y2 = height
     cropped_face = resized_face.crop((x1, y1, x2, y2))
     return cropped_face
@@ -81,8 +81,8 @@ def crop_match_width(pil_face, width, height):
     resized_face = pil_face.resize((width, resize_height))
     out_image = Image.new("RGB", (width, height), color="white")
     extra_height = height - resize_height
-    y1 = max(min(extra_height / 2), height, 0)
-    y2 = max(min(height - (extra_height / 2), height), 0)
+    y1 = max(min(int(extra_height / 2), height), 0)
+    y2 = max(min(height - int(extra_height / 2), height), 0)
     out_image.paste(resized_face, box=(0, y1, width, y2))
     return out_image
 
