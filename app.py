@@ -71,10 +71,10 @@ def face_crop_to_epd(original, face_location):
     return crop_match_width(original, face_location, epd7in5.EPD_HEIGHT, epd7in5.EPD_WIDTH).rotate(270, expand=True)
 
 def crop_match_width(original, face_location, width, height):
-    x1 = face_location[1]
-    y1 = face_location[0]
-    x2 = face_location[3]
-    y2 = face_location[2]
+    x1 = face_location[0]
+    y1 = face_location[1]
+    x2 = face_location[2]
+    y2 = face_location[3]
     print('locations', face_location)
     face_width = x2 - x1
     face_height = y2 - y1
