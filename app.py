@@ -38,27 +38,35 @@ def capture_loop():
 
     if len(face_locations) == 0:
         return
-    
-    face_landmarks_list = face_recognition.face_landmarks(numpy_image, face_locations=face_locations[:1])
 
-    if len(face_landmarks_list) == 0:
-        print('No landmarks for found for face location')
-        return
+    face_location = largest_face_location(face_locations)
+    for index, member in enumerate(face_location):
+        face_location[index] = int(member / face_image_scale)
 
-    face_location = face_locations[0]
+    # face_landmarks_list = face_recognition.face_landmarks(numpy_image, face_locations=[face_location])
+    #
+    # if len(face_landmarks_list) == 0:
+    #     print('No landmarks for found for face location')
+    #     return
 
-    pil_face = pil_image.crop((int(face_location[3] / face_image_scale),
-                           int(face_location[0] / face_image_scale),
-                           int(face_location[1] / face_image_scale),
-                           int(face_location[2] / face_image_scale)))
-
-    displayed_face = face_crop_to_epd(pil_face)
+    displayed_face = face_crop_to_epd(pil_image, face_location)
     print('render')
     epd.display_frame(epd.get_frame_buffer(displayed_face))
 
 
-def face_crop_to_epd(pil_face):
-    return crop_match_width(pil_face, epd7in5.EPD_HEIGHT, epd7in5.EPD_WIDTH).rotate(270, expand=True)
+def largest_face_location(face_locations):
+    largest = None
+    largest_area = 0
+    for face_location in face_locations:
+        area = (face_location[2] - face_location[0]) * (face_location[1] - face_location[3])
+        if area > largest_area:
+            largest_area = area
+            largest = face_location
+    return largest
+
+
+def face_crop_to_epd(original, face_location):
+    return crop_match_width(original, face_location, epd7in5.EPD_HEIGHT, epd7in5.EPD_WIDTH).rotate(270, expand=True)
     #return crop_match_height(pil_face, epd7in5.EPD_HEIGHT, epd7in5.EPD_WIDTH).rotate(270, expand=True)
 
 
@@ -75,16 +83,20 @@ def crop_match_height(pil_face, width, height):
     return cropped_face
 
 
-def crop_match_width(pil_face, width, height):
-    resize_ratio = pil_face.width / width
-    resize_height = int(pil_face.height / resize_ratio)
-    resized_face = pil_face.resize((width, resize_height))
-    out_image = Image.new("RGB", (width, height), color="white")
+def crop_match_width(original, face_location, width, height):
+    x1 = face_location[3]
+    y1 = face_location[0]
+    x2 = face_location[1]
+    y2 = face_location[2]
+    face_width = x2 - x1
+    face_height = y2 - y1
+    resize_ratio = face_width / width
+    resize_height = int(face_height / resize_ratio)
     extra_height = height - resize_height
-    y1 = max(min(int(extra_height / 2), height), 0)
-    y2 = max(min(height - int(extra_height / 2), height), 0)
-    out_image.paste(resized_face, box=(0, y1, width, y2))
-    return out_image
+    y1 = max(y1 - int(extra_height/2), 0)
+    y2 = min(y1 + height, original.height)
+
+    return original.crop((x1, y1, x2, y2))
 
 
 def reset_error_count():
