@@ -40,8 +40,10 @@ def capture_loop():
         return
 
     face_location = largest_face_location(face_locations)
-    for index, member in enumerate(face_location):
-        face_location[index] = int(member / face_image_scale)
+    face_location = (int(face_location[3] / face_image_scale),
+                           int(face_location[0] / face_image_scale),
+                           int(face_location[1] / face_image_scale),
+                           int(face_location[2] / face_image_scale))
 
     # face_landmarks_list = face_recognition.face_landmarks(numpy_image, face_locations=[face_location])
     #
