@@ -86,9 +86,9 @@ def crop_match_height(pil_face, width, height):
 
 
 def crop_match_width(original, face_location, width, height):
-    x1 = face_location[3]
+    x1 = face_location[1]
     y1 = face_location[0]
-    x2 = face_location[1]
+    x2 = face_location[3]
     y2 = face_location[2]
     face_width = x2 - x1
     face_height = y2 - y1
@@ -99,7 +99,7 @@ def crop_match_width(original, face_location, width, height):
     print(extra_height)
     y1 = max(y1 - int(extra_height/2), 0)
     y2 = min(y2 + int(extra_height/2), original.height)
-    print(x1, y1, x2, y2)
+    print(x1, y1, x2, y2, (x2-x1)/(y2-y1))
     return original.crop((x1, y1, x2, y2)).resize((width, height))
 
 
