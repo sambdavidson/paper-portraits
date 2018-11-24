@@ -14,7 +14,7 @@ ERROR_LIMIT = 10
 error_count = 0
 capture_image_width = 3280
 capture_image_height = 2464
-face_image_scale = 0.125
+face_image_scale = 0.25
 
 print('Initializing EPD')
 epd = epd7in5.EPD()
