@@ -14,7 +14,7 @@ ERROR_LIMIT = 10
 error_count = 0
 capture_image_width = 3280
 capture_image_height = 2464
-face_image_scale = 0.25
+face_image_scale = 0.125
 
 print('Initializing EPD')
 epd = epd7in5.EPD()
@@ -75,10 +75,8 @@ def crop_match_width(original, face_location, width, height):
     y1 = face_location[1]
     x2 = face_location[2]
     y2 = face_location[3]
-    print('locations', face_location)
     face_width = x2 - x1
     face_height = y2 - y1
-    print('dimensions', face_width, face_height)
     aspect_ratio = height / width
     new_height = face_width * aspect_ratio
     extra_height = int(new_height - face_height)
