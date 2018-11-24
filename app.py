@@ -94,9 +94,10 @@ def crop_match_width(original, face_location, width, height):
     face_height = y2 - y1
     resize_ratio = face_width / width
     resize_height = int(face_height / resize_ratio)
-    extra_height = height - resize_height
+    goal_height = int(height / resize_ratio)
+    extra_height = goal_height - resize_height
     y1 = max(y1 - int(extra_height/2), 0)
-    y2 = min(y1 + height, original.height)
+    y2 = min(y1 + goal_height, original.height)
     print(x1, y1, x2, y2)
     return original.crop((x1, y1, x2, y2)).resize((width, height))
 
