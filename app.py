@@ -82,7 +82,7 @@ def crop_match_height(pil_face, width, height):
     x2 = max(min(resize_width - int(extra_width / 2), resize_width), 0)
     y2 = height
     cropped_face = resized_face.crop((x1, y1, x2, y2))
-    return cropped_face
+    return cropped_face.resize(width,height)
 
 
 def crop_match_width(original, face_location, width, height):
@@ -98,7 +98,7 @@ def crop_match_width(original, face_location, width, height):
     y1 = max(y1 - int(extra_height/2), 0)
     y2 = min(y1 + height, original.height)
 
-    return original.crop((x1, y1, x2, y2))
+    return original.crop((x1, y1, x2, y2)).resize((width, height))
 
 
 def reset_error_count():
