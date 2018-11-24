@@ -69,30 +69,16 @@ def largest_face_location(face_locations):
 
 def face_crop_to_epd(original, face_location):
     return crop_match_width(original, face_location, epd7in5.EPD_HEIGHT, epd7in5.EPD_WIDTH).rotate(270, expand=True)
-    #return crop_match_height(pil_face, epd7in5.EPD_HEIGHT, epd7in5.EPD_WIDTH).rotate(270, expand=True)
-
-
-def crop_match_height(pil_face, width, height):
-    resize_ratio = pil_face.height / height
-    resize_width = int(pil_face.width / resize_ratio)
-    resized_face = pil_face.resize((resize_width, height))
-    extra_width = resize_width - width
-    x1 = max(min(int(extra_width / 2), resize_width), 0)
-    y1 = 0
-    x2 = max(min(resize_width - int(extra_width / 2), resize_width), 0)
-    y2 = height
-    cropped_face = resized_face.crop((x1, y1, x2, y2))
-    return cropped_face.resize(width,height)
-
 
 def crop_match_width(original, face_location, width, height):
     x1 = face_location[1]
     y1 = face_location[0]
     x2 = face_location[3]
     y2 = face_location[2]
+    print('locations', face_location)
     face_width = x2 - x1
     face_height = y2 - y1
-    print(face_width, face_height)
+    print('dimensions', face_width, face_height)
     aspect_ratio = height / width
     new_height = face_width * aspect_ratio
     extra_height = int(new_height - face_height)
