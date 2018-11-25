@@ -51,7 +51,7 @@ def capture_loop():
         print('no encoding')
         return
 
-    if last_face is None:
+    if last_face is not None:
         print('Distance from last', face_recognition.face_distance(face_encodings, last_face))
     last_face = face_encodings[0]
 
