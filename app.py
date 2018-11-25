@@ -26,6 +26,7 @@ camera.resolution = (capture_image_width, capture_image_height)
 
 last_face = None
 
+
 def capture_loop():
     global capture_image_width, capture_image_height, face_image_scale, camera, last_face
     reset_error_count()
@@ -41,6 +42,7 @@ def capture_loop():
     if len(face_locations) == 0:
         return
 
+    print('Sharpness', sharpness(pil_image))
     face_location = largest_face_location(face_locations)
 
     face_encodings = face_recognition.face_encodings(numpy_image, known_face_locations=[face_location])
@@ -54,15 +56,9 @@ def capture_loop():
     last_face = face_encodings[0]
 
     face_location = (int(face_location[3] / face_image_scale),
-                           int(face_location[0] / face_image_scale),
-                           int(face_location[1] / face_image_scale),
-                           int(face_location[2] / face_image_scale))
-
-    # face_landmarks_list = face_recognition.face_landmarks(numpy_image, face_locations=[face_location])
-    #
-    # if len(face_landmarks_list) == 0:
-    #     print('No landmarks for found for face location')
-    #     return
+                     int(face_location[0] / face_image_scale),
+                     int(face_location[1] / face_image_scale),
+                     int(face_location[2] / face_image_scale))
 
     displayed_face = face_crop_to_epd(pil_image, face_location)
     print('render')
@@ -83,6 +79,14 @@ def largest_face_location(face_locations):
 def face_crop_to_epd(original, face_location):
     return crop_match_width(original, face_location, epd7in5.EPD_HEIGHT, epd7in5.EPD_WIDTH).rotate(270, expand=True)
 
+
+def sharpness(image):
+    im = image.convert('L')
+    array = numpy.asarray(im, dtype=numpy.int32)
+    gy, gx = numpy.gradient(array)
+    gnorm = numpy.sqrt(gx**2 + gy**2)
+    return numpy.average(gnorm)
+
 def crop_match_width(original, face_location, width, height):
     x1 = face_location[0]
     y1 = face_location[1]
@@ -94,9 +98,9 @@ def crop_match_width(original, face_location, width, height):
     new_height = face_width * aspect_ratio
     extra_height = int(new_height - face_height)
     print(extra_height)
-    y1 = max(y1 - int(extra_height/2), 0)
-    y2 = min(y2 + int(extra_height/2), original.height)
-    print(x1, y1, x2, y2, (x2-x1)/(y2-y1))
+    y1 = max(y1 - int(extra_height / 2), 0)
+    y2 = min(y2 + int(extra_height / 2), original.height)
+    print(x1, y1, x2, y2, (x2 - x1) / (y2 - y1))
     return original.crop((x1, y1, x2, y2)).resize((width, height))
 
 
@@ -111,6 +115,7 @@ def error(e):
     error_count += 1
     if error_count == ERROR_LIMIT:
         sys.exit()
+
 
 print('Running main loop...')
 while True:
