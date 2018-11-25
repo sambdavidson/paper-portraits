@@ -24,8 +24,10 @@ print('Initializing PiCamera')
 camera = PiCamera()
 camera.resolution = (capture_image_width, capture_image_height)
 
+last_face = None
+
 def capture_loop():
-    global capture_image_width, capture_image_height, face_image_scale, camera
+    global capture_image_width, capture_image_height, face_image_scale, camera, last_face
     reset_error_count()
 
     stream = BytesIO()
@@ -40,6 +42,17 @@ def capture_loop():
         return
 
     face_location = largest_face_location(face_locations)
+
+    face_encodings = face_recognition.face_encodings(numpy_image, known_face_locations=[face_location])
+
+    if len(face_encodings) == 0:
+        print('no encoding')
+        return
+
+    if last_face is None:
+        print('Distance from last', face_recognition.face_distance(face_encodings, last_face))
+    last_face = face_encodings[0]
+
     face_location = (int(face_location[3] / face_image_scale),
                            int(face_location[0] / face_image_scale),
                            int(face_location[1] / face_image_scale),
