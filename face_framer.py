@@ -99,8 +99,8 @@ class FaceFramer:
 
     def __crop_face_to_epd(self, pil_image, face_location):
         """Crops the input PIL Image to fit the face at face_location to the EPD width and height."""
-        w = self.epd_width
-        h = self.epd_height
+        w = self.epd_height  # Swap because we are looking at the face in portrait but the actual display is landscape.
+        h = self.epd_width  # Swap because we are looking at the face in portrait but the actual display is landscape.
         x1 = face_location[0]
         y1 = face_location[1]
         x2 = face_location[2]
