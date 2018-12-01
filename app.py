@@ -19,6 +19,8 @@ def loop():
     """Main loop that runs FaceFramer work. Captures errors."""
     try:
         face = face_framer.find_new_face_and_display_to_epd()
+        if face is None:
+            return
         image_saver.save_image(face)
         reset_error_count()
     except Exception as e:

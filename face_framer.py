@@ -33,7 +33,7 @@ class FaceFramer:
         """Returns new face captured and displayed to EPD. Returns None if no new face was found."""
         img = self.__capture_photo()
         face, enc = self.__largest_face_location_and_encodings(img)
-        if not all([face, enc]):
+        if face is None or enc is None:
             return None
 
         if self.last_face_encodings is None:
