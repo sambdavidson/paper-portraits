@@ -26,11 +26,11 @@ class FaceFramer:
         self.camera.resolution = (CAMERA_WIDTH, CAMERA_HEIGHT)
         print('... Done.')
 
-    def display_image(self, image):
+    def display_image_to_epd(self, image):
         self.epd.display_frame(self.epd.get_frame_buffer(image))
 
-    def find_new_face_and_display_to_epd(self):
-        """Returns new face captured and displayed to EPD. Returns None if no new face was found."""
+    def find_new_face(self):
+        """Returns new face captured in PiCamera. Returns None if no new face was found."""
         img = self.__capture_photo()
         face, enc = self.__largest_face_location_and_encodings(img)
         if face is None or enc is None:
@@ -52,9 +52,7 @@ class FaceFramer:
         self.last_face_encodings = enc
         self.displayed_face_encodings = enc
         # Crop, draw, and return face.
-        epd_face = self.__crop_face_to_epd(img, face).convert('1')
-        self.display_image(epd_face)
-        return epd_face
+        return self.__crop_face_to_epd(img, face).convert('1')
 
     def __capture_photo(self):
         """Captures a photo from the PiCamera and returns it as a PIL Image."""

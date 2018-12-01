@@ -18,10 +18,11 @@ error_image = Image.open(ERROR_IMAGE_LOCATION)
 def loop():
     """Main loop that runs FaceFramer work. Captures errors."""
     try:
-        face = face_framer.find_new_face_and_display_to_epd()
+        face = face_framer.find_new_face()
         if face is None:
             return
-        image_saver.save_image(face)
+        face_framer.display_image_to_epd(face)
+        image_saver.save_image(face.rotate(-90, expand=True))
         reset_error_count()
     except Exception as e:
         error(e)
@@ -37,11 +38,11 @@ def error(e):
     print('Error: {}'.format(e)) # TODO: Remove this to avoid STDOUT overflow
     error_count += 1
     if error_count == ERROR_LIMIT:
-        face_framer.display_image(error_image)
+        face_framer.display_image_to_epd(error_image)
         sys.exit()
 
 
 print('Running main loop...')
-face_framer.display_image(error_image)
+face_framer.display_image_to_epd(error_image)
 while True:
     loop()

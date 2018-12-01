@@ -14,5 +14,5 @@ def save_image(image):
     """Save passed image to the face folder.
     Encodes current timestamp as file name.
     """
-    filename = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S.jpg')
-    image.save(os.path.join(FACE_FOLDER, filename))
+    filename = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S.png')
+    image.save(os.path.join(FACE_FOLDER, filename), "PNG")
