@@ -22,7 +22,7 @@ def loop():
         if face is None:
             return
         face_framer.display_image_to_epd(face)
-        image_saver.save_image(face.rotate(-90, expand=True))
+        image_saver.save_image(face.rotate(90, expand=True))
         reset_error_count()
     except Exception as e:
         error(e)
