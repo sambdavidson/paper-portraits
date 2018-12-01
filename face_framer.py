@@ -108,9 +108,7 @@ class FaceFramer:
         aspect_ratio = h / w
         new_height = face_width * aspect_ratio
         extra_height = int(new_height - face_height)
-        print(extra_height)
         y1 = max(y1 - int(extra_height / 2), 0)
         y2 = min(y2 + int(extra_height / 2), pil_image.height)
-        print(x1, y1, x2, y2, (x2 - x1) / (y2 - y1))
         return pil_image.crop((x1, y1, x2, y2)).resize((w, h)).rotate(270, expand=True)
 

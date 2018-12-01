@@ -21,6 +21,7 @@ def loop():
         face = face_framer.find_new_face()
         if face is None:
             return
+        # TODO: Draw debug info based on buttons pressed.
         face_framer.display_image_to_epd(face)
         image_saver.save_image(face.rotate(90, expand=True))
         reset_error_count()
@@ -43,6 +44,5 @@ def error(e):
 
 
 print('Running main loop...')
-face_framer.display_image_to_epd(error_image)
 while True:
     loop()
