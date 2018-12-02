@@ -10,7 +10,7 @@ import datetime
 
 ERROR_WARN_LIMIT = 3
 ERROR_IMAGE_LOCATION = os.path.join(os.path.dirname(__file__), 'error_screen.png')
-ERROR_LOG_LOCATION = os.path.join(os.path.dirname(__file__), 'log.txt')
+ERROR_LOG_LOCATION = os.path.join(os.path.dirname(__file__), 'errors.log')
 
 consecutive_error_count = 0
 face_framer = face_framer.FaceFramer(epd7in5)
@@ -47,7 +47,7 @@ def error(e):
 def append_to_log(text):
     with open(ERROR_LOG_LOCATION, 'a+') as logfile:
         timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
-        logfile.write('{}:\n{}'.format(timestamp, text))
+        logfile.write('\n\n{}:\n{}'.format(timestamp, text))
 
 
 print('Running main loop...')

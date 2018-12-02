@@ -57,3 +57,6 @@ faces
 
 # PyCharm IDE files
 .idea
+
+# Python junk
+__pycache__
