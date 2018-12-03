@@ -1,5 +1,4 @@
 from PIL import Image
-import sys
 import os
 import face_framer
 import epd7in5
