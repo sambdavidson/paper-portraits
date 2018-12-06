@@ -14,6 +14,7 @@ ERROR_WARN_LIMIT = 3
 ERROR_IMAGE_LOCATION = os.path.join(os.path.dirname(__file__), 'error_screen.png')
 ERROR_LOG_LOCATION = os.path.join(os.path.dirname(__file__), 'errors.log')
 SHUTDOWN_IMAGE_LOCATION = os.path.join(os.path.dirname(__file__), 'shutdown_screen.png')
+REQUIRE_NEW_FACE_GPIO_PIN = 26
 
 welcome_image = Image.open(WELCOME_IMAGE_LOCATION)
 consecutive_error_count = 0
@@ -21,7 +22,7 @@ face_framer = face_framer.FaceFramer(epd7in5)
 error_image = Image.open(ERROR_IMAGE_LOCATION)
 shutdown_image = Image.open(SHUTDOWN_IMAGE_LOCATION)
 
-require_new_face_button = Button(26)
+require_new_face_button = Button(REQUIRE_NEW_FACE_GPIO_PIN)
 require_new_face_button.when_pressed = face_framer.change_require_new_face
 
 
