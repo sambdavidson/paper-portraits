@@ -51,7 +51,6 @@ class FaceFramer:
         # I think this gives this feeling like you have made your mark and its now a portrait of you, until of course
         # someone new comes along. I think it is up the context on whether this is a good UX. Can be toggled with the
         # function
-        print(self.require_new_face)
         if self.require_new_face and self.displayed_face_encodings is not None and \
                 face_recognition.face_distance([enc], self.displayed_face_encodings) < SAME_FACE_ENCODINGS_TOLERANCE:
             # Face too similar, probably the same person
