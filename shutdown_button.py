@@ -42,11 +42,12 @@ def shutdown():
     global pre_shutdown_function, __shutting_down
     __shutting_down = True
 
+    print("Shutting down...")
     if pre_shutdown_function is not None:
         if callable(pre_shutdown_function):
             pre_shutdown_function()
         else:
-            print("WARNING: pre-shutdown function not callable")
+            print("ERROR: pre-shutdown function not callable")
 
     # call("sudo shutdown -h now", shell=True) # UNCOMMENT WHEN ACTUALLY IN PHOTO FRAME
     quit() # Used instead of shutdown for testing.
