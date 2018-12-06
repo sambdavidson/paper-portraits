@@ -41,13 +41,13 @@ class FaceFramer:
         if self.last_face_encodings is None:
             self.last_face_encodings = enc
             return None
-
+        print('C')
         # A short distance means the same person stared for a long while AND the photo wasn't very blurry.
         # A large distance means its either a different person or one photo was blurry and gave bad encodings.
         if face_recognition.face_distance([enc], self.last_face_encodings) > SAME_FACE_ENCODINGS_TOLERANCE:
             self.last_face_encodings = enc
             return None
-
+        print('D')
         # Check if its a new face/person, if not don't display it.
         # I think this gives this feeling like you have made your mark and its now a portrait of you, until of course
         # someone new comes along. I think it is up the context on whether this is a good UX. Can be toggled with the
@@ -56,10 +56,11 @@ class FaceFramer:
             # Face too similar, probably the same person
             print("DEBUG: Face too familiar")
             return None
-
+        print('E')
         self.last_face_encodings = enc
         self.displayed_face_encodings = enc
         # Crop, draw, and return face.
+        print('F')
         return self.__crop_face_to_epd(img, face).convert('1')
 
     def change_require_new_face(self, require=None):
