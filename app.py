@@ -8,12 +8,13 @@ import face_framer
 import image_saver
 import shutdown_button
 
-
+WELCOME_IMAGE_LOCATION = os.path.join(os.path.dirname(__file__), 'welcome_screen.png')
 ERROR_WARN_LIMIT = 3
 ERROR_IMAGE_LOCATION = os.path.join(os.path.dirname(__file__), 'error_screen.png')
 ERROR_LOG_LOCATION = os.path.join(os.path.dirname(__file__), 'errors.log')
 SHUTDOWN_IMAGE_LOCATION = os.path.join(os.path.dirname(__file__), 'shutdown_screen.png')
 
+welcome_image = Image.open(WELCOME_IMAGE_LOCATION)
 consecutive_error_count = 0
 face_framer = face_framer.FaceFramer(epd7in5)
 error_image = Image.open(ERROR_IMAGE_LOCATION)
@@ -25,6 +26,7 @@ require_new_face_button.when_pressed = face_framer.change_require_new_face
 
 def end_setup():
     shutdown_button.pre_shutdown_function = pre_shutdown
+    face_framer.display_image_to_epd(welcome_image)
 
 
 def loop():
@@ -65,6 +67,6 @@ def pre_shutdown():
 
 
 end_setup()
-print('Running...')
+print('Running loop...')
 while True:
     loop()
