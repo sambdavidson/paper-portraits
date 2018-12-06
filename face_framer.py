@@ -55,7 +55,6 @@ class FaceFramer:
         if self.require_new_face and self.displayed_face_encodings is not None and \
                 face_recognition.face_distance([enc], self.displayed_face_encodings) < SAME_FACE_ENCODINGS_TOLERANCE:
             # Face too similar, probably the same person
-            print("DEBUG: Face too familiar")
             return None
 
         self.last_face_encodings = enc
@@ -66,9 +65,7 @@ class FaceFramer:
     def change_require_new_face(self, require=None):
         """Toggles whether we require a new face outside of the tolerances before displaying.
         Supplying require=True or require=False sets the requirement to that bool instead."""
-        print("DEBUG: change require new face")
         if require is not None:
-            print('Am I dumb?')
             self.require_new_face = require
         else:
             self.require_new_face = not self.require_new_face
