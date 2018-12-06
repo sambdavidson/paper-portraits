@@ -1,5 +1,6 @@
 from PIL import Image
 from gpiozero import Button
+import sys
 import os
 import time
 import datetime
@@ -59,7 +60,10 @@ def error(e):
 def append_to_log(text):
     with open(ERROR_LOG_LOCATION, 'a+') as logfile:
         timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
-        logfile.write('\n\n{}:\n{}'.format(timestamp, text))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        file = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        error_metadata = 'Type: {}\tFile: {}\tLine: {}\tTime: {}'.format(exc_type, file, exc_tb.tb_lineno, timestamp)
+        logfile.write('\n\n{}:\n{}'.format(error_metadata, text))
 
 
 def pre_shutdown():
