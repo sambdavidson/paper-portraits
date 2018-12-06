@@ -1,19 +1,22 @@
 from PIL import Image
 import os
-import face_framer
-import epd7in5
-import image_saver
 import time
 import datetime
+import epd7in5
+import face_framer
+import image_saver
+import shutdown_button
 
 
 ERROR_WARN_LIMIT = 3
 ERROR_IMAGE_LOCATION = os.path.join(os.path.dirname(__file__), 'error_screen.png')
 ERROR_LOG_LOCATION = os.path.join(os.path.dirname(__file__), 'errors.log')
+SHUTDOWN_IMAGE_LOCATION = os.path.join(os.path.dirname(__file__), 'shutdown_screen.png')
 
 consecutive_error_count = 0
 face_framer = face_framer.FaceFramer(epd7in5)
 error_image = Image.open(ERROR_IMAGE_LOCATION)
+shutdown_image = Image.open(SHUTDOWN_IMAGE_LOCATION)
 
 
 def loop():
@@ -49,6 +52,11 @@ def append_to_log(text):
         logfile.write('\n\n{}:\n{}'.format(timestamp, text))
 
 
-print('Running main loop...')
+def pre_shutdown():
+    face_framer.display_image_to_epd(shutdown_image)
+
+
+shutdown_button.pre_shutdown_function = pre_shutdown
+print('Running...')
 while True:
     loop()
