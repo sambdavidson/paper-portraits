@@ -53,7 +53,8 @@ class FaceFramer:
         # someone new comes along. I think it is up the context on whether this is a good UX. Can be toggled with the
         # function
         print(self.require_new_face)
-        if self.require_new_face and (face_recognition.face_distance([enc], self.displayed_face_encodings) < SAME_FACE_ENCODINGS_TOLERANCE):
+        if self.require_new_face is True and \
+                face_recognition.face_distance([enc], self.displayed_face_encodings) < SAME_FACE_ENCODINGS_TOLERANCE:
             # Face too similar, probably the same person
             print("DEBUG: Face too familiar")
             return None
