@@ -52,7 +52,8 @@ class FaceFramer:
         # I think this gives this feeling like you have made your mark and its now a portrait of you, until of course
         # someone new comes along. I think it is up the context on whether this is a good UX. Can be toggled with the
         # function
-        if self.require_new_face and face_recognition.face_distance([enc], self.displayed_face_encodings) < SAME_FACE_ENCODINGS_TOLERANCE:
+        print(self.require_new_face)
+        if self.require_new_face and (face_recognition.face_distance([enc], self.displayed_face_encodings) < SAME_FACE_ENCODINGS_TOLERANCE):
             # Face too similar, probably the same person
             print("DEBUG: Face too familiar")
             return None
@@ -68,6 +69,7 @@ class FaceFramer:
         Supplying require=True or require=False sets the requirement to that bool instead."""
         print("DEBUG: change require new face")
         if require is not None:
+            print('Am I dumb?')
             self.require_new_face = require
         else:
             self.require_new_face = not self.require_new_face
