@@ -1,4 +1,5 @@
 from PIL import Image
+from gpiozero import Button
 import os
 import time
 import datetime
@@ -18,11 +19,18 @@ face_framer = face_framer.FaceFramer(epd7in5)
 error_image = Image.open(ERROR_IMAGE_LOCATION)
 shutdown_image = Image.open(SHUTDOWN_IMAGE_LOCATION)
 
+require_new_face_button = Button(26)
+require_new_face_button.when_pressed = face_framer.change_require_new_face
+
+
+def end_setup():
+    shutdown_button.pre_shutdown_function = pre_shutdown
+
 
 def loop():
     """Main loop that runs FaceFramer work. Captures errors."""
     try:
-        face = face_framer.find_new_face()
+        face = face_framer.find_face()
         if face is None:
             return
         # TODO: Draw debug info based on buttons pressed.
@@ -56,7 +64,7 @@ def pre_shutdown():
     face_framer.display_image_to_epd(shutdown_image)
 
 
-shutdown_button.pre_shutdown_function = pre_shutdown
+end_setup()
 print('Running...')
 while True:
     loop()
