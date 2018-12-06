@@ -32,11 +32,12 @@ class FaceFramer:
 
     def find_face(self):
         """Returns new face captured in PiCamera. Returns None if no new face was found."""
+        print('A')
         img = self.__capture_photo()
         face, enc = self.__largest_face_location_and_encodings(img)
         if face is None or enc is None:
             return None
-
+        print('B')
         if self.last_face_encodings is None:
             self.last_face_encodings = enc
             return None
@@ -79,17 +80,18 @@ class FaceFramer:
 
     def __largest_face_location_and_encodings(self, pil_image):
         """Returns a tuple of the largest face location and its encoding or None if no face is found."""
+        print('1')
         cv_width = int(pil_image.width * FACIAL_RECOGNITION_IMAGE_SCALE)
         cv_height = int(pil_image.height * FACIAL_RECOGNITION_IMAGE_SCALE)
         numpy_image = numpy.array(pil_image.resize([cv_width, cv_height]))
         face_locations = face_recognition.face_locations(numpy_image)
-
+        print('2')
         if len(face_locations) == 0:
             return None, None
-
+        print('3')
         largest_face = self.__largest_bounding_box(face_locations)
         face_encodings = face_recognition.face_encodings(numpy_image, known_face_locations=[largest_face])
-
+        print('4')
         if len(face_encodings) == 0:
             return None, None
 
