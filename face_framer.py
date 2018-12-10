@@ -3,6 +3,7 @@ from io import BytesIO
 from picamera import PiCamera
 import face_recognition
 import numpy
+import leds
 
 CAMERA_WIDTH = 3280
 CAMERA_HEIGHT = 2464
@@ -68,6 +69,11 @@ class FaceFramer:
             self.require_new_face = require
         else:
             self.require_new_face = not self.require_new_face
+
+        if self.require_new_face:
+            leds.blink_green_led()
+        else:
+            leds.blink_red_led()
 
     def __capture_photo(self):
         """Captures a photo from the PiCamera and returns it as a PIL Image."""

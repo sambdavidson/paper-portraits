@@ -2,6 +2,7 @@
 from gpiozero import Button
 from threading import Timer
 from subprocess import call
+import leds
 
 GPIO_PIN = 5
 REQUIRED_CLICKS = 5
@@ -18,6 +19,7 @@ __shutting_down = False
 
 def click_with_timeout():
     global active_clicks, timeout_timer, __shutting_down
+    leds.blink_red_led()
 
     if __shutting_down:
         return
