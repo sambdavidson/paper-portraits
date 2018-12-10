@@ -26,6 +26,7 @@ def click_with_timeout():
         timeout_timer.cancel()
 
     timeout_timer = Timer(TIMEOUT, reset)
+    timeout_timer.start()
     active_clicks += 1
     if active_clicks >= REQUIRED_CLICKS:
         shutdown()
