@@ -60,3 +60,6 @@ faces
 
 # Python junk
 __pycache__
+
+# dlib facial recognition buildfiles
+dlib
