@@ -12,15 +12,16 @@ def __str2bool(v):
 
 
 parser = argparse.ArgumentParser(description='Paper Portraits')
-parser.add_argument('-d', '--debug', type=__str2bool, nargs='?', const=True, default=NICE, help='enable debug printing')
+parser.add_argument('-d', '--debug', type=__str2bool, nargs='?', const=True, default=False, help='Enable debug printing/')
 args = parser.parse_args()
 
+
 def info(v):
-    if not args.debug:
+    if args.debug:
         print('INFO[{}]: {}'.format(time.strftime("%H:%M:%S", time.gmtime()), v))
 
 
 def error(v):
-    if not args.debug:
+    if args.debug:
         print('ERROR[{}]: {}'.format(time.strftime("%H:%M:%S", time.gmtime()), v))
 
