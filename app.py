@@ -8,6 +8,8 @@ import epd7in5
 import face_framer
 import image_saver
 import shutdown_button
+import debug_print
+from stopwatch import Stopwatch
 
 WELCOME_IMAGE_LOCATION = os.path.join(os.path.dirname(__file__), 'welcome_screen.png')
 ERROR_WARN_LIMIT = 3
@@ -34,12 +36,18 @@ def end_setup():
 def loop():
     """Main loop that runs FaceFramer work. Captures errors."""
     try:
+        sw = Stopwatch()
         face = face_framer.find_face()
+        # TODO: clean these up
+        debug_print.info('Timing: find_face: {}'.format(time.strftime('%H:%M:%S', time.gmtime(sw.lap()))))
         if face is None:
+            debug_print.info('No face found in image.')
             return
         # TODO: Draw debug info based on buttons pressed.
         face_framer.display_image_to_epd(face)
+        debug_print.info('Timing: display_image_to_epd: {}'.format(time.strftime('%H:%M:%S', time.gmtime(sw.lap()))))
         image_saver.save_image(face.rotate(90, expand=True))
+        debug_print.info('Timing: save_image: {}'.format(time.strftime('%H:%M:%S', time.gmtime(sw.lap()))))
         reset_consecutive_error_count()
     except Exception as e:
         error(e)
@@ -53,6 +61,7 @@ def reset_consecutive_error_count():
 def error(e):
     global consecutive_error_count, error_image
     append_to_log(e)
+    debug_print.error(e)
     consecutive_error_count += 1
     if consecutive_error_count >= ERROR_WARN_LIMIT:
         face_framer.display_image_to_epd(error_image)
