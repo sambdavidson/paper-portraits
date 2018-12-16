@@ -1,10 +1,19 @@
 import time
 import argparse
 
-parser = argparse.ArgumentParser(description='Paper Portraits')
-parser.add_argument('-d', '--debug', type=bool, action='store_true', help='enable debug printing')
-args = parser.parse_args()
 
+def __str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
+parser = argparse.ArgumentParser(description='Paper Portraits')
+parser.add_argument('-d', '--debug', type=__str2bool, nargs='?', const=True, default=NICE, help='enable debug printing')
+args = parser.parse_args()
 
 def info(v):
     if not args.debug:
@@ -14,3 +23,4 @@ def info(v):
 def error(v):
     if not args.debug:
         print('ERROR[{}]: {}'.format(time.strftime("%H:%M:%S", time.gmtime()), v))
+
