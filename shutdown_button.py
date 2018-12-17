@@ -52,7 +52,7 @@ def shutdown():
         else:
             print("ERROR: pre-shutdown function not callable")
 
-    # call("sudo shutdown -h now", shell=True) # UNCOMMENT WHEN ACTUALLY IN PHOTO FRAME
+    # call("sudo shutdown -h now", shell=True)  # UNCOMMENT WHEN ACTUALLY IN PHOTO FRAME
     quit() # Used instead of shutdown for testing.
 
 

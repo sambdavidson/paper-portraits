@@ -5,6 +5,7 @@ import os
 import time
 import datetime
 import epd7in5
+import leds
 import face_framer
 import image_saver
 import shutdown_button
@@ -81,7 +82,10 @@ def append_to_log(text):
 
 
 def pre_shutdown():
-    face_framer.display_image_to_epd(shutdown_image)
+    leds.turn_on_red()
+    leds.turn_on_red()
+    time.sleep(3)
+    # face_framer.display_image_to_epd(shutdown_image)  # This image is fun but since it takes forever to push a frame
 
 
 dft.time_action('global vars')

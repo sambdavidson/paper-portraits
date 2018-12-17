@@ -181,28 +181,6 @@ class EPD:
     def display_frame(self, frame_buffer):
         self.send_command(DATA_START_TRANSMISSION_1)
         dft.time_action('send_command(DATA_START_TRANSMISSION_1)')
-
-        # DELETE START
-        for i in range(0, 30720):
-            temp1 = frame_buffer[i]
-            j = 0
-            while j < 8:
-                if temp1 & 0x80:
-                    temp2 = 0x03
-                else:
-                    temp2 = 0x00
-                temp2 = (temp2 << 4) & 0xFF
-                temp1 = (temp1 << 1) & 0xFF
-                j += 1
-                if temp1 & 0x80:
-                    temp2 |= 0x03
-                else:
-                    temp2 |= 0x00
-                temp1 = (temp1 << 1) & 0xFF
-                j += 1
-        dft.time_action('send_data_loop_no_send_data')
-
-        # DELETE END
         for i in range(0, 30720):
             temp1 = frame_buffer[i]
             j = 0
