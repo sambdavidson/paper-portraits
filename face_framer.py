@@ -4,6 +4,7 @@ from picamera import PiCamera
 import face_recognition
 import numpy
 import leds
+import debug_print
 from function_timer import default as dft
 
 CAMERA_WIDTH = 2464  # Max width is 3280, square for facial recognition speed.
@@ -51,15 +52,18 @@ class FaceFramer:
         dft.function_return()
 
         if face is None or enc is None:
+            debug_print.info('No face found.')
             return None
 
         if self.last_face_encodings is None:
             self.last_face_encodings = enc
+            debug_print.info('First face.')
             return None
         # A short distance means the same person stared for a long while AND the photo wasn't very blurry.
         # A large distance means its either a different person or one photo was blurry and gave bad encodings.
         if face_recognition.face_distance([enc], self.last_face_encodings) > SAME_FACE_ENCODINGS_TOLERANCE:
             self.last_face_encodings = enc
+            debug_print.info('Two different faces in a row.')
             return None
 
         # Check if its a new face/person, if not don't display it.
@@ -69,6 +73,7 @@ class FaceFramer:
         if self.require_new_face and self.displayed_face_encodings is not None and \
                 face_recognition.face_distance([enc], self.displayed_face_encodings) < SAME_FACE_ENCODINGS_TOLERANCE:
             # Face too similar, probably the same person
+            debug_print.info('Face too similar to previous.')
             return None
         dft.time_action('face_distances')
         self.last_face_encodings = enc

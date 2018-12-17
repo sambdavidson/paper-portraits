@@ -44,7 +44,6 @@ def loop():
         dft.function_return()
         # TODO: clean these up
         if face is None:
-            debug_print.info('No face found.')
             return
         # TODO: Draw debug info based on buttons pressed.
         dft.start_function('display_image_to_epd')
