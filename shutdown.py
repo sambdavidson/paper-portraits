@@ -14,14 +14,14 @@ timeout_timer = None
 pre_shutdown_function = None
 
 # Tracks if we are shutting down. Don't want to call shutdown callbacks a bunch
-__shutting_down = False
+shutting_down = False
 
 
 def click_with_timeout():
-    global active_clicks, timeout_timer, __shutting_down
+    global active_clicks, timeout_timer, shutting_down
     leds.blink_red_led()
 
-    if __shutting_down:
+    if shutting_down:
         return
 
     if timeout_timer is not None:

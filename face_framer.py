@@ -19,7 +19,8 @@ class FaceFramer:
         print('Initializing FaceFramer...')
         self.last_face_encodings = None
         self.displayed_face_encodings = None
-        self.require_new_face = True
+        self.require_new_face = False
+        self.require_two_same_face = False
         print('EPD')
         self.epd = epd_module.EPD()
         self.epd_width = epd_module.EPD_WIDTH
@@ -57,11 +58,13 @@ class FaceFramer:
 
         if self.last_face_encodings is None:
             self.last_face_encodings = enc
-            debug_print.info('First face.')
-            return None
+            if self.require_two_same_face:
+                debug_print.info('First face.')
+                return None
         # A short distance means the same person stared for a long while AND the photo wasn't very blurry.
         # A large distance means its either a different person or one photo was blurry and gave bad encodings.
-        if face_recognition.face_distance([enc], self.last_face_encodings) > SAME_FACE_ENCODINGS_TOLERANCE:
+        if self.require_two_same_face and \
+                face_recognition.face_distance([enc], self.last_face_encodings) > SAME_FACE_ENCODINGS_TOLERANCE:
             self.last_face_encodings = enc
             debug_print.info('Two different faces in a row.')
             return None
@@ -81,7 +84,21 @@ class FaceFramer:
         # Crop, draw, and return face.
         return self.__crop_face_to_epd(img, face).convert('1')
 
+
     def change_require_new_face(self, require=None):
+        """Toggles whether we require a new face outside of the tolerances before displaying.
+        Supplying require=True or require=False sets the requirement to that bool instead."""
+        if require is not None:
+            self.require_two_same_face = require
+        else:
+            self.require_two_same_face = not self.require_two_same_face
+
+        if self.require_two_same_face:
+            leds.blink_green_led()
+        else:
+            leds.blink_red_led()
+
+    def change_require_two_same_face(self, require=None):
         """Toggles whether we require a new face outside of the tolerances before displaying.
         Supplying require=True or require=False sets the requirement to that bool instead."""
         if require is not None:

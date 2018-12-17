@@ -8,7 +8,7 @@ import epd7in5
 import leds
 import face_framer
 import image_saver
-import shutdown_button
+import shutdown
 import debug_print
 from function_timer import default as dft
 
@@ -18,6 +18,7 @@ ERROR_IMAGE_LOCATION = os.path.join(os.path.dirname(__file__), 'error_screen.png
 ERROR_LOG_LOCATION = os.path.join(os.path.dirname(__file__), 'errors.log')
 SHUTDOWN_IMAGE_LOCATION = os.path.join(os.path.dirname(__file__), 'shutdown_screen.png')
 REQUIRE_NEW_FACE_GPIO_PIN = 26
+REQUIRE_TWO_SAME_FACE_GPIO_PIN = 6
 
 welcome_image = Image.open(WELCOME_IMAGE_LOCATION)
 consecutive_error_count = 0
@@ -28,9 +29,12 @@ shutdown_image = Image.open(SHUTDOWN_IMAGE_LOCATION)
 require_new_face_button = Button(REQUIRE_NEW_FACE_GPIO_PIN)
 require_new_face_button.when_pressed = face_framer.change_require_new_face
 
+require_two_same_face_button = Button(REQUIRE_TWO_SAME_FACE_GPIO_PIN)
+require_two_same_face_button.when_pressed = face_framer.change_require_two_same_face
+
 
 def end_setup():
-    shutdown_button.pre_shutdown_function = pre_shutdown
+    shutdown.pre_shutdown_function = pre_shutdown
     dft.start_function('display_image_to_epd')
     face_framer.display_image_to_epd(welcome_image)
     dft.function_return()
@@ -38,6 +42,10 @@ def end_setup():
 
 def loop():
     """Main loop that runs FaceFramer work. Captures errors."""
+    if shutdown.shutting_down:
+        time.sleep(100)
+        return
+
     try:
         dft.start_function('find_face')
         face = face_framer.find_face()
@@ -82,7 +90,7 @@ def append_to_log(text):
 
 def pre_shutdown():
     leds.turn_on_red()
-    leds.turn_on_red()
+    leds.turn_on_green()
     time.sleep(3)
     # face_framer.display_image_to_epd(shutdown_image)  # This image is fun but since it takes forever to push a frame
 
