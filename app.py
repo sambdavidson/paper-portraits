@@ -9,7 +9,7 @@ import face_framer
 import image_saver
 import shutdown_button
 import debug_print
-from stopwatch import Stopwatch
+from function_timer import default as dft
 
 WELCOME_IMAGE_LOCATION = os.path.join(os.path.dirname(__file__), 'welcome_screen.png')
 ERROR_WARN_LIMIT = 3
@@ -36,18 +36,20 @@ def end_setup():
 def loop():
     """Main loop that runs FaceFramer work. Captures errors."""
     try:
-        sw = Stopwatch()
+        dft.start_function('find_face')
         face = face_framer.find_face()
+        dft.function_return()
         # TODO: clean these up
-        debug_print.info('Timing: find_face: {}'.format(time.strftime('%H:%M:%S', time.gmtime(sw.lap()))))
         if face is None:
-            debug_print.info('No face found in image.')
+            debug_print.info('No face found.')
             return
         # TODO: Draw debug info based on buttons pressed.
+        dft.start_function('display_image_to_epd')
         face_framer.display_image_to_epd(face)
-        debug_print.info('Timing: display_image_to_epd: {}'.format(time.strftime('%H:%M:%S', time.gmtime(sw.lap()))))
+        dft.function_return()
+        dft.start_function('save_image')
         image_saver.save_image(face.rotate(90, expand=True))
-        debug_print.info('Timing: save_image: {}'.format(time.strftime('%H:%M:%S', time.gmtime(sw.lap()))))
+        dft.function_return()
         reset_consecutive_error_count()
     except Exception as e:
         error(e)
@@ -83,4 +85,6 @@ def pre_shutdown():
 end_setup()
 print('Running loop...')
 while True:
+    dft.reset('loop')
     loop()
+    debug_print.info('TIMINGS:\n'+dft.timings_string())

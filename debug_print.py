@@ -24,4 +24,3 @@ def info(v):
 def error(v):
     if args.debug:
         print('ERROR[{}]: {}'.format(time.strftime("%H:%M:%S", time.gmtime()), v))
-

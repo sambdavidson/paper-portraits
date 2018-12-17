@@ -4,6 +4,7 @@ from picamera import PiCamera
 import face_recognition
 import numpy
 import leds
+from function_timer import default as dft
 
 CAMERA_WIDTH = 3280
 CAMERA_HEIGHT = 2464
@@ -29,12 +30,20 @@ class FaceFramer:
         print('... Done.')
 
     def display_image_to_epd(self, image):
-        self.epd.display_frame(self.epd.get_frame_buffer(image))
+        dft.start_function('get_frame_buffer')
+        frame_buffer = self.epd.get_frame_buffer(image)
+        dft.function_return()
+        dft.start_function('display_frame')
+        self.epd.display_frame(frame_buffer)
+        dft.function_return()
 
     def find_face(self):
         """Returns new face captured in PiCamera. Returns None if no new face was found."""
         img = self.__capture_photo()
+        dft.time_action('__capture_photo')
+        dft.start_function('__largest_face_location_and_encodings')
         face, enc = self.__largest_face_location_and_encodings(img)
+        dft.function_return()
 
         if face is None or enc is None:
             return None
@@ -56,7 +65,7 @@ class FaceFramer:
                 face_recognition.face_distance([enc], self.displayed_face_encodings) < SAME_FACE_ENCODINGS_TOLERANCE:
             # Face too similar, probably the same person
             return None
-
+        dft.time_action('face_distances')
         self.last_face_encodings = enc
         self.displayed_face_encodings = enc
         # Crop, draw, and return face.
