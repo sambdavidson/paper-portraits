@@ -158,6 +158,7 @@ class EPD:
 
     def get_frame_buffer(self, image):
         buf = [0x00] * int(self.width * self.height / 8)
+        dft.time_action('new buffer')
         # Set buffer to value of Python Imaging Library image.
         # Image must be in mode 1.
         image_monocolor = image.convert('1')
@@ -165,18 +166,43 @@ class EPD:
         if imwidth != self.width or imheight != self.height:
             raise ValueError('Image must be same dimensions as display \
                 ({0}x{1}).' .format(self.width, self.height))
+        dft.time_action('validate image')
 
         pixels = image_monocolor.load()
+        dft.time_action('load image')
         for y in range(self.height):
             for x in range(self.width):
                 # Set the bits for the column of pixels at the current position.
                 if pixels[x, y] != 0:
                     buf[int((x + y * self.width) / 8)] |= 0x80 >> (x % 8)
+        dft.time_action('fill buffer')
         return buf
 
     def display_frame(self, frame_buffer):
         self.send_command(DATA_START_TRANSMISSION_1)
         dft.time_action('send_command(DATA_START_TRANSMISSION_1)')
+
+        # DELETE START
+        for i in range(0, 30720):
+            temp1 = frame_buffer[i]
+            j = 0
+            while j < 8:
+                if temp1 & 0x80:
+                    temp2 = 0x03
+                else:
+                    temp2 = 0x00
+                temp2 = (temp2 << 4) & 0xFF
+                temp1 = (temp1 << 1) & 0xFF
+                j += 1
+                if temp1 & 0x80:
+                    temp2 |= 0x03
+                else:
+                    temp2 |= 0x00
+                temp1 = (temp1 << 1) & 0xFF
+                j += 1
+        dft.time_action('send_data_loop_no_send_data')
+
+        # DELETE END
         for i in range(0, 30720):
             temp1 = frame_buffer[i]
             j = 0
