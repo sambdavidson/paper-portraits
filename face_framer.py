@@ -8,7 +8,7 @@ from function_timer import default as dft
 
 CAMERA_WIDTH = 2464  # Max width is 3280, square for facial recognition speed.
 CAMERA_HEIGHT = 2464
-FACIAL_RECOGNITION_IMAGE_SCALE = 14
+FACIAL_RECOGNITION_IMAGE_SCALE = 14  # 2464 / 14 = 176
 # Face encoding difference must be at least this before we recognize it as a different face.
 SAME_FACE_ENCODINGS_TOLERANCE = 0.3
 
@@ -21,7 +21,6 @@ class FaceFramer:
         self.require_new_face = True
         print('EPD')
         self.epd = epd_module.EPD()
-        self.epd.init()
         self.epd_width = epd_module.EPD_WIDTH
         self.epd_height = epd_module.EPD_HEIGHT
         print('PiCamera')
@@ -30,13 +29,18 @@ class FaceFramer:
         print('... Done.')
 
     def display_image_to_epd(self, image):
+        dft.start_function('epd init')
+        self.epd.init()
+        dft.function_return()
         dft.start_function('get_frame_buffer')
         frame_buffer = self.epd.get_frame_buffer(image)
         dft.function_return()
         dft.start_function('display_frame')
         self.epd.display_frame(frame_buffer)
         dft.function_return()
+        dft.start_function('epd sleep')
         self.epd.sleep()
+        dft.function_return()
 
     def find_face(self):
         """Returns new face captured in PiCamera. Returns None if no new face was found."""
