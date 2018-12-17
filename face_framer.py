@@ -6,9 +6,9 @@ import numpy
 import leds
 from function_timer import default as dft
 
-CAMERA_WIDTH = 3280
+CAMERA_WIDTH = 2464  # Max width is 3280, square for facial recognition speed.
 CAMERA_HEIGHT = 2464
-FACIAL_RECOGNITION_IMAGE_SCALE = 0.125
+FACIAL_RECOGNITION_IMAGE_SCALE = 14
 # Face encoding difference must be at least this before we recognize it as a different face.
 SAME_FACE_ENCODINGS_TOLERANCE = 0.3
 
@@ -94,8 +94,8 @@ class FaceFramer:
 
     def __largest_face_location_and_encodings(self, pil_image):
         """Returns a tuple of the largest face location and its encoding or None if no face is found."""
-        cv_width = int(pil_image.width * FACIAL_RECOGNITION_IMAGE_SCALE)
-        cv_height = int(pil_image.height * FACIAL_RECOGNITION_IMAGE_SCALE)
+        cv_width = int(pil_image.width / FACIAL_RECOGNITION_IMAGE_SCALE)
+        cv_height = int(pil_image.height / FACIAL_RECOGNITION_IMAGE_SCALE)
         numpy_image = numpy.array(pil_image.resize([cv_width, cv_height]))
         face_locations = face_recognition.face_locations(numpy_image)
         if len(face_locations) == 0:
@@ -106,10 +106,10 @@ class FaceFramer:
         if len(face_encodings) == 0:
             return None, None
 
-        largest_face_rescaled = (int(largest_face[3] / FACIAL_RECOGNITION_IMAGE_SCALE),
-                                 int(largest_face[0] / FACIAL_RECOGNITION_IMAGE_SCALE),
-                                 int(largest_face[1] / FACIAL_RECOGNITION_IMAGE_SCALE),
-                                 int(largest_face[2] / FACIAL_RECOGNITION_IMAGE_SCALE))
+        largest_face_rescaled = (int(largest_face[3] * FACIAL_RECOGNITION_IMAGE_SCALE),
+                                 int(largest_face[0] * FACIAL_RECOGNITION_IMAGE_SCALE),
+                                 int(largest_face[1] * FACIAL_RECOGNITION_IMAGE_SCALE),
+                                 int(largest_face[2] * FACIAL_RECOGNITION_IMAGE_SCALE))
         return largest_face_rescaled, face_encodings[0]
 
     def __crop_face_to_epd(self, pil_image, face_location):
