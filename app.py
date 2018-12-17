@@ -30,9 +30,9 @@ require_new_face_button.when_pressed = face_framer.change_require_new_face
 
 def end_setup():
     shutdown_button.pre_shutdown_function = pre_shutdown
-    dft.reset('display_welcome_image')
+    dft.start_function('display_image_to_epd')
     face_framer.display_image_to_epd(welcome_image)
-    debug_print.info('TIMINGS:\n' + dft.timings_string())
+    dft.function_return()
 
 
 def loop():
@@ -84,7 +84,12 @@ def pre_shutdown():
     face_framer.display_image_to_epd(shutdown_image)
 
 
+dft.time_action('global vars')
+dft.start_function('end_setup')
 end_setup()
+dft.function_return()
+debug_print.info('Startup Timings:\n' + dft.timings_string())
+
 print('Running loop...')
 while True:
     dft.reset('loop')

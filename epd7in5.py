@@ -27,6 +27,7 @@
 import epdif
 from PIL import Image
 import RPi.GPIO as GPIO
+from function_timer import default as dft
 
 # Display resolution
 EPD_WIDTH       = 640
@@ -101,7 +102,7 @@ class EPD:
         epdif.spi_transfer([data])
 
     def init(self):
-        if (epdif.epd_init() != 0):
+        if epdif.epd_init() != 0:
             return -1
         self.reset()
 
@@ -146,7 +147,7 @@ class EPD:
         self.send_data(0x03)
 
     def wait_until_idle(self):
-        while(self.digital_read(self.busy_pin) == 0):      # 0: busy, 1: idle
+        while self.digital_read(self.busy_pin) == 0:      # 0: busy, 1: idle
             self.delay_ms(100)
 
     def reset(self):
@@ -175,27 +176,32 @@ class EPD:
 
     def display_frame(self, frame_buffer):
         self.send_command(DATA_START_TRANSMISSION_1)
+        dft.time_action('send_command(DATA_START_TRANSMISSION_1)')
         for i in range(0, 30720):
             temp1 = frame_buffer[i]
             j = 0
-            while (j < 8):
-                if(temp1 & 0x80):
+            while j < 8:
+                if temp1 & 0x80:
                     temp2 = 0x03
                 else:
                     temp2 = 0x00
                 temp2 = (temp2 << 4) & 0xFF
                 temp1 = (temp1 << 1) & 0xFF
                 j += 1
-                if(temp1 & 0x80):
+                if temp1 & 0x80:
                     temp2 |= 0x03
                 else:
                     temp2 |= 0x00
                 temp1 = (temp1 << 1) & 0xFF
                 self.send_data(temp2)
                 j += 1
+        dft.time_action('send_data_loop')
         self.send_command(DISPLAY_REFRESH)
+        dft.time_action('refresh')
         self.delay_ms(100)
+        dft.time_action('wait 100ms')
         self.wait_until_idle()
+        dft.time_action('wait_until_idle')
 
     def sleep(self):
         self.send_command(POWER_OFF)

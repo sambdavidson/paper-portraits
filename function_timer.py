@@ -92,4 +92,4 @@ class Stopwatch:
         return time.time() - self.start
 
 
-default = FunctionTimer('main')
+default = FunctionTimer('init')
