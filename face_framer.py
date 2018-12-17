@@ -36,6 +36,7 @@ class FaceFramer:
         dft.start_function('display_frame')
         self.epd.display_frame(frame_buffer)
         dft.function_return()
+        self.epd.sleep()
 
     def find_face(self):
         """Returns new face captured in PiCamera. Returns None if no new face was found."""
