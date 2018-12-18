@@ -20,13 +20,13 @@ saved_images = 0
 
 # Google Cloud Bucket
 GOOGLE_CLOUD_BUCKET_NAME = 'paper-portraits-faces'
-google_cloud_bucket = None
+google_cloud_client = None
 
 
 def set_google_cloud_identity(filepath):
-    global google_cloud_bucket
+    global google_cloud_client
     print('Loading Google Cloud Identity: ', filepath)
-    google_cloud_bucket = storage.Client.from_service_account_json(filepath).get_bucket(GOOGLE_CLOUD_BUCKET_NAME)
+    google_cloud_client = storage.Client.from_service_account_json(filepath)
 
 
 def save_image(image):
@@ -45,8 +45,9 @@ def save_image(image):
 
 
 def save_to_google_cloud(image_name, image_path):
-    if google_cloud_bucket is None:
+    if google_cloud_client is None:
         return
 
-    image_blob = google_cloud_bucket.blob(image_name)
+    bucket = google_cloud_client.get_bucket(GOOGLE_CLOUD_BUCKET_NAME)
+    image_blob = bucket.blob(image_name)
     image_blob.upload_from_filename(image_path)
