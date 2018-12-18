@@ -47,7 +47,9 @@ def save_image(image):
 def save_to_google_cloud(image_name, image_path):
     if google_cloud_client is None:
         return
-
-    bucket = google_cloud_client.get_bucket(GOOGLE_CLOUD_BUCKET_NAME)
-    image_blob = bucket.blob(image_name)
-    image_blob.upload_from_filename(image_path)
+    try:
+        bucket = google_cloud_client.get_bucket(GOOGLE_CLOUD_BUCKET_NAME)
+        image_blob = bucket.blob(image_name)
+        image_blob.upload_from_filename(image_path)
+    except Exception as e:
+        print('error uploading to google cloud')  # TODO: Better story around this when we don't have internet.
