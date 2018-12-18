@@ -30,8 +30,6 @@ args = parser.parse_args()
 debug_print.set_debug_mode(args.debug)
 if args.google_cloud_identity_filepath:
     image_saver.set_google_cloud_identity(args.google_cloud_identity_filepath)
-    quit()
-
 
 WELCOME_IMAGE_LOCATION = os.path.join(os.path.dirname(__file__), 'welcome_screen.png')
 ERROR_WARN_LIMIT = 3
