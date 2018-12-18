@@ -28,8 +28,8 @@ parser.add_argument('--google_cloud_identity_filepath', type=str)
 args = parser.parse_args()
 
 debug_print.set_debug_mode(args.debug)
-if args.debug:
-    print('DEBUG', args)
+if args.google_cloud_identity_filepath:
+    image_saver.set_google_cloud_identity(args.google_cloud_identity_filepath)
     quit()
 
 

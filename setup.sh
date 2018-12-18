@@ -25,7 +25,7 @@ apt-get install -qq python3-gpiozero
 
 printf "Installing Python3 picamera:\n"
 apt-get install -qq python3-picamera
-# Maybe run after facial stuff: sudo pip3 install --upgrade picamera[array] 
+# Maybe run after facial stuff: sudo pip3 install --upgrade picamera[array]
 
 printf "Installing Python3 Facial Recognition:\n"
 printf "\tInstalling essential apt packages:\n"
@@ -142,5 +142,9 @@ printf "^ Don't forget or screw that up!"
 read -p "Press enter when ready..."
 raspi-config
 
+printf "Installing Python3 google-cloud-storage:\n"
+pip3 install --upgrade google-cloud-storage
+
 printf "Installing assorted other things..."
 apt-get install -qq libatlas-base-dev
+

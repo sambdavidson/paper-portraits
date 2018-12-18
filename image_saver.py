@@ -1,8 +1,7 @@
 import time
 import datetime
 import os
-
-# TODO: Consider online storage buckets for these images. Something like Google GCS or something similar.
+from google.cloud import storage
 
 FACE_FOLDER = os.path.join(os.path.dirname(__file__), 'faces')
 # Ensure FACE_FOLDER exists
@@ -19,9 +18,15 @@ MAX_IMAGE_SAVED_COUNT = int((free_space * 0.7) / IMAGE_SIZE_APPROX)
 # Counter of saved images so far.
 saved_images = 0
 
+# Google Cloud Bucket
+GOOGLE_CLOUD_BUCKET_NAME = 'paper-portraits-faces'
+google_cloud_bucket = None
 
-def set_google_cloud_identity_filepath(filepath):
-    print('foo')
+
+def set_google_cloud_identity(filepath):
+    global google_cloud_bucket
+    print('Loading Google Cloud Identity: ', filepath)
+    google_cloud_bucket = storage.Client.from_service_account_json(filepath).get_bucket(GOOGLE_CLOUD_BUCKET_NAME)
 
 
 def save_image(image):
@@ -33,5 +38,15 @@ def save_image(image):
         return
     saved_images += 1
 
-    filename = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S.png')
-    image.save(os.path.join(FACE_FOLDER, filename), "PNG")
+    image_name = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S.png')
+    image_path = os.path.join(FACE_FOLDER, image_name)
+    image.save(image_path, "PNG")
+    save_to_google_cloud(image_name, image_path)
+
+
+def save_to_google_cloud(image_name, image_path):
+    if google_cloud_bucket is None:
+        return
+
+    image_blob = google_cloud_bucket.blob(image_name)
+    image_blob.upload_from_filename(image_path)
