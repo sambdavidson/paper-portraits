@@ -63,3 +63,6 @@ __pycache__
 
 # dlib facial recognition buildfiles
 dlib
+
+# Cloud identities for face photo backup
+keys
