@@ -84,7 +84,6 @@ class FaceFramer:
         # Crop, draw, and return face.
         return self.__crop_face_to_epd(img, face).convert('1')
 
-
     def change_require_new_face(self, require=None):
         """Toggles whether we require a new face outside of the tolerances before displaying.
         Supplying require=True or require=False sets the requirement to that bool instead."""
@@ -94,8 +93,10 @@ class FaceFramer:
             self.require_two_same_face = not self.require_two_same_face
 
         if self.require_two_same_face:
+            debug_print.info('Enable require a new face than the one currently displayed.')
             leds.blink_green_led()
         else:
+            debug_print.info('Disable require a new face than the one currently displayed.')
             leds.blink_red_led()
 
     def change_require_two_same_face(self, require=None):
@@ -107,6 +108,7 @@ class FaceFramer:
             self.require_new_face = not self.require_new_face
 
         if self.require_new_face:
+            debug_print.info('Enable require of two same face in a row.')
             leds.blink_green_led()
         else:
             leds.blink_red_led()

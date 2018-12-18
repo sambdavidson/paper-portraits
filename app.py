@@ -4,6 +4,7 @@ import sys
 import os
 import time
 import datetime
+import argparse
 import epd7in5
 import leds
 import face_framer
@@ -11,6 +12,26 @@ import image_saver
 import shutdown
 import debug_print
 from function_timer import default as dft
+
+def __str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
+parser = argparse.ArgumentParser(description='Paper Portraits')
+parser.add_argument('-d', '--debug', type=__str2bool, nargs='?', const=True, default=False, help='Enable debug printing/')
+parser.add_argument('--google_cloud_identity_filepath', type=str)
+args = parser.parse_args()
+
+debug_print.set_debug_mode(args.debug)
+if args.debug:
+    print('DEBUG', args)
+    quit()
+
 
 WELCOME_IMAGE_LOCATION = os.path.join(os.path.dirname(__file__), 'welcome_screen.png')
 ERROR_WARN_LIMIT = 3

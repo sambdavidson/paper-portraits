@@ -20,6 +20,10 @@ MAX_IMAGE_SAVED_COUNT = int((free_space * 0.7) / IMAGE_SIZE_APPROX)
 saved_images = 0
 
 
+def set_google_cloud_identity_filepath(filepath):
+    print('foo')
+
+
 def save_image(image):
     """Save passed image to the face folder.
     Encodes current timestamp as file name.
