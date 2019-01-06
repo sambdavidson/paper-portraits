@@ -3,6 +3,7 @@ from gpiozero import Button
 from threading import Timer
 from subprocess import call
 import leds
+import debug_print
 
 GPIO_PIN = 5
 REQUIRED_CLICKS = 5
@@ -52,8 +53,10 @@ def shutdown():
         else:
             print("ERROR: pre-shutdown function not callable")
 
-    call("sudo shutdown -h now", shell=True)  # UNCOMMENT WHEN ACTUALLY IN PHOTO FRAME
-    # quit() # Used instead of shutdown for testing.
+    if debug_print.debug_mode:
+        quit()  # Used instead of shutdown for testing.
+    else:
+        call("sudo shutdown -h now", shell=True)  # UNCOMMENT WHEN ACTUALLY IN PHOTO FRAME
 
 
 button = Button(GPIO_PIN)
