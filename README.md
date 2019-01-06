@@ -18,6 +18,11 @@ With debug printing.
 sudo python3 app.py --debug
 ```
 
+With debug printing and no display which is significantly faster.
+```bash
+sudo python3 app.py --debug --no_display
+```
+
 With GCP storage (requires a GCP identity and correctly named bucket).
 ```bash
 sudo python3 app.py --google_cloud_identity_filepath /home/pi/paper-portraits/keys/my_key.json

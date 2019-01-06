@@ -23,7 +23,10 @@ def __str2bool(v):
 
 
 parser = argparse.ArgumentParser(description='Paper Portraits')
-parser.add_argument('-d', '--debug', type=__str2bool, nargs='?', const=True, default=False, help='Enable debug printing/')
+parser.add_argument('-d', '--debug', type=__str2bool, nargs='?', const=True, default=False,
+                    help='Enable debug printing')
+parser.add_argument('-n', '--no_display', type=__str2bool, nargs='?', const=True, default=False,
+                    help='Disable displaying to EPD, major speedup and useful for debugging')
 parser.add_argument('--google_cloud_identity_filepath', type=str)
 args = parser.parse_args()
 

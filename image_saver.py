@@ -55,7 +55,7 @@ def save_to_google_cloud(image_name, image_path):
         image_blob = bucket.blob(image_name)
         image_blob.upload_from_filename(image_path)
     except Exception as e:
-        debug_print.error('Error uploading image ({}) to GCP Storage: {}', image_name, e)
+        debug_print.error('Error uploading image ({}) to GCP Storage: {}'.format(image_name, e))
 
 
 def has_internet_access():

@@ -9,7 +9,8 @@ from function_timer import default as dft
 
 CAMERA_WIDTH = 2464  # Max width is 3280, square for facial recognition speed.
 CAMERA_HEIGHT = 2464
-FACIAL_RECOGNITION_IMAGE_SCALE = 14  # 2464 / 14 = 176
+# Factors of 2464: 2, 2, 2, 2, 2, 7, 11
+FACIAL_RECOGNITION_IMAGE_SCALE = 14  # 2464 / 14 = 176:
 # Face encoding difference must be at least this before we recognize it as a different face.
 SAME_FACE_ENCODINGS_TOLERANCE = 0.3
 
@@ -21,6 +22,7 @@ class FaceFramer:
         self.displayed_face_encodings = None
         self.require_new_face = False
         self.require_two_same_face = False
+        self.no_display = False
         print('EPD')
         self.epd = epd_module.EPD()
         self.epd_width = epd_module.EPD_WIDTH
@@ -30,7 +32,12 @@ class FaceFramer:
         self.camera.resolution = (CAMERA_WIDTH, CAMERA_HEIGHT)
         print('... Done.')
 
+    def set_no_display(self, no_display):
+        self.no_display = no_display
+
     def display_image_to_epd(self, image):
+        if self.no_display:
+            return
         dft.start_function('epd init')
         self.epd.init()
         dft.function_return()
