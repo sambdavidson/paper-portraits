@@ -1,6 +1,8 @@
 import time
 import datetime
 import os
+import socket
+import debug_print
 from google.cloud import storage
 
 FACE_FOLDER = os.path.join(os.path.dirname(__file__), 'faces')
@@ -41,7 +43,8 @@ def save_image(image):
     image_name = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S.png')
     image_path = os.path.join(FACE_FOLDER, image_name)
     image.save(image_path, "PNG")
-    save_to_google_cloud(image_name, image_path)
+    if has_internet_access():
+        save_to_google_cloud(image_name, image_path)
 
 
 def save_to_google_cloud(image_name, image_path):
@@ -52,4 +55,13 @@ def save_to_google_cloud(image_name, image_path):
         image_blob = bucket.blob(image_name)
         image_blob.upload_from_filename(image_path)
     except Exception as e:
-        print('error uploading to google cloud')  # TODO: Better story around this when we don't have internet.
+        debug_print.error('Error uploading image ({}) to GCP Storage: {}', image_name, e)
+
+
+def has_internet_access():
+    try:
+        socket.create_connection(("www.google.com", 80))
+        return True
+    except OSError:
+        pass
+    return False
