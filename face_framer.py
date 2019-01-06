@@ -21,7 +21,7 @@ class FaceFramer:
         self.last_face_encodings = None
         self.displayed_face_encodings = None
         self.require_new_face = False
-        self.require_two_same_face = False
+        self.require_two_same_face = True
         self.no_display = False
         print('EPD')
         self.epd = epd_module.EPD()
@@ -175,3 +175,10 @@ class FaceFramer:
                 largest_area = area
                 largest = bounding_box
         return largest
+
+
+# Assumes all image sizes are equal to CAMERA resolutions.
+def horizontal_join_images(img1, img2):
+    new_image = Image.new('RGB', (CAMERA_WIDTH * 2, CAMERA_HEIGHT))
+    new_image.paste(img1, (0, 0))
+    new_image.paste(img2, (CAMERA_WIDTH, 0))
