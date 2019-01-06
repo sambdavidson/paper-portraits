@@ -45,6 +45,7 @@ REQUIRE_TWO_SAME_FACE_GPIO_PIN = 6
 welcome_image = Image.open(WELCOME_IMAGE_LOCATION)
 consecutive_error_count = 0
 face_framer = face_framer.FaceFramer(epd7in5)
+face_framer.set_no_display(args.no_display)
 error_image = Image.open(ERROR_IMAGE_LOCATION)
 shutdown_image = Image.open(SHUTDOWN_IMAGE_LOCATION)
 
