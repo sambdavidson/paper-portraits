@@ -65,6 +65,7 @@ class FaceFramer:
 
         if self.last_fr_image is None:
             if self.require_two_same_face:
+                self.last_fr_image = fr_image
                 debug_print.info('First face found but two are requires to display.')
                 return None
 
