@@ -19,7 +19,7 @@ class FaceRecognitionImage:
         return len(self.raw_face_locations) > 0
 
     def _face_locations(self):
-        return [api._trim_css_to_bounds(api._rect_to_css(face.rect), self.numpy_image.shape)
+        return [api._trim_css_to_bounds(api._rect_to_css(face), self.numpy_image.shape)
                 for face in self.raw_face_locations]
 
     def face_encodings(self):
