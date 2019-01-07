@@ -41,7 +41,7 @@ class FaceRecognitionImage:
         if self._largest_face_location is not None:
             return self._largest_face_location
 
-        loc = sorted(self._face_locations(), key=box_area)[(-1):]
+        loc = sorted(self._face_locations(), key=box_area)[-1]
 
         self._largest_face_location = (int(loc[3] * self.cv_scale), int(loc[0] * self.cv_scale),
                                        int(loc[1] * self.cv_scale), int(loc[2] * self.cv_scale))
