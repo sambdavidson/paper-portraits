@@ -2,7 +2,7 @@
 # Rather than recomputing the raw face locations a bunch of times. They are saved and reused.
 # Accesses a bunch of protected members. I am OK with that!
 
-import face_recognition
+from face_recognition import api
 import numpy
 
 
@@ -11,7 +11,7 @@ class FaceRecognitionImage:
         self.pil_image = pil_image
         self.cv_scale = scale
         self.numpy_image = shrunken_numpy_image(pil_image, scale)
-        self.raw_face_locations = face_recognition._raw_face_locations(self.numpy_image)
+        self.raw_face_locations = api._raw_face_locations(self.numpy_image)
         self._largest_face_encoding = None
         self._largest_face_location = None
 
@@ -19,14 +19,14 @@ class FaceRecognitionImage:
         return len(self.raw_face_locations) > 0
 
     def _face_locations(self):
-        return [face_recognition._trim_css_to_bounds(face_recognition._rect_to_css(face.rect), self.numpy_image.shape)
+        return [api._trim_css_to_bounds(api._rect_to_css(face.rect), self.numpy_image.shape)
                 for face in self.raw_face_locations]
 
     def face_encodings(self):
-        pose_predictor = face_recognition.pose_predictor_5_point
+        pose_predictor = api.pose_predictor_5_point
         raw_landmarks = [pose_predictor(self.numpy_image, face_location) for face_location in self.raw_face_locations]
 
-        self._largest_face_encoding = [numpy.array(face_recognition.face_encoder.compute_face_descriptor(self.numpy_image, raw_landmark_set, 1)) for
+        self._largest_face_encoding = [numpy.array(api.face_encoder.compute_face_descriptor(self.numpy_image, raw_landmark_set, 1)) for
                 raw_landmark_set in raw_landmarks]
         return self._largest_face_encoding
 
@@ -49,11 +49,11 @@ class FaceRecognitionImage:
         if self._largest_face_encoding is not None:
             return self._largest_face_encoding
 
-        locations = [face_recognition._css_to_rect(face_location) for face_location in self.largest_face_location()]
-        pose_predictor = face_recognition.pose_predictor_5_point
+        locations = [api._css_to_rect(face_location) for face_location in self.largest_face_location()]
+        pose_predictor = api.pose_predictor_5_point
         raw_landmarks = [pose_predictor(self.numpy_image, face_location) for face_location in locations]
         self._largest_face_encoding = [
-            numpy.array(face_recognition.face_encoder.compute_face_descriptor(self.numpy_image, raw_landmark_set, 1))
+            numpy.array(api.face_encoder.compute_face_descriptor(self.numpy_image, raw_landmark_set, 1))
             for
             raw_landmark_set in raw_landmarks]
         return self._largest_face_encoding
