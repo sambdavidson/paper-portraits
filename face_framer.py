@@ -78,7 +78,7 @@ class FaceFramer:
             self.last_fr_image = fr_image
             debug_print.info('Last two faces were likely different. Settings require them to likely match.')
             return None
-
+        dft.time_action('face_distance last two')
         # Check if its a new face/person, if not don't display it.
         # I think this gives this feeling like you have made your mark and its now a portrait of you, until of course
         # someone new comes along. I think it is up the context on whether this is a good UX. Can be toggled with the
@@ -91,7 +91,7 @@ class FaceFramer:
             self.last_fr_image = fr_image
             debug_print.info('Found face too similar to displayed face. Settings require a likely new person.')
             return None
-        dft.time_action('face_distances')
+        dft.time_action('face_distance displayed and next')
         self.last_fr_image = fr_image
         self.displayed_fr_image = fr_image
         # Crop, draw, and return face.
