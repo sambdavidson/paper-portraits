@@ -5,6 +5,7 @@ import face_recognition
 import numpy
 import leds
 import debug_print
+import face_recognition_image
 from function_timer import default as dft
 
 CAMERA_WIDTH = 2464  # Max width is 3280, square for facial recognition speed.
@@ -18,8 +19,8 @@ SAME_FACE_ENCODINGS_TOLERANCE = 0.3
 class FaceFramer:
     def __init__(self, epd_module):
         print('Initializing FaceFramer...')
-        self.last_face_encodings = None
-        self.displayed_face_encodings = None
+        self.last_fr_image = None
+        self.displayed_fr_image = None
         self.require_new_face = False
         self.require_two_same_face = True
         self.no_display = False
@@ -53,43 +54,47 @@ class FaceFramer:
 
     def find_face(self):
         """Returns new face captured in PiCamera. Returns None if no new face was found."""
-        img = self.__capture_photo()
+        image = self.__capture_photo()
         dft.time_action('__capture_photo')
-        dft.start_function('__largest_face_location_and_encodings')
-        face, enc = self.__largest_face_location_and_encodings(img)
-        dft.function_return()
+        fr_image = face_recognition_image.FaceRecognitionImage(image, FACIAL_RECOGNITION_IMAGE_SCALE)
+        dft.time_action('FaceRecognitionImage generation')
 
-        if face is None or enc is None:
-            debug_print.info('No face found.')
+        if not fr_image.faces_exist_in_image():
+            debug_print.info('No face found in capture.')
             return None
 
-        if self.last_face_encodings is None:
-            self.last_face_encodings = enc
+        if self.last_fr_image is None:
             if self.require_two_same_face:
-                debug_print.info('First face.')
+                debug_print.info('First face found but two are requires to display.')
                 return None
+
         # A short distance means the same person stared for a long while AND the photo wasn't very blurry.
         # A large distance means its either a different person or one photo was blurry and gave bad encodings.
         if self.require_two_same_face and \
-                face_recognition.face_distance([enc], self.last_face_encodings) > SAME_FACE_ENCODINGS_TOLERANCE:
-            self.last_face_encodings = enc
-            debug_print.info('Two different faces in a row.')
+                face_recognition.face_distance([fr_image.largest_face_encodings()],
+                                               self.last_fr_image.largest_face_encodings()) \
+                > SAME_FACE_ENCODINGS_TOLERANCE:
+            self.last_fr_image = fr_image
+            debug_print.info('Last two faces were likely different. Settings require them to likely match.')
             return None
 
         # Check if its a new face/person, if not don't display it.
         # I think this gives this feeling like you have made your mark and its now a portrait of you, until of course
         # someone new comes along. I think it is up the context on whether this is a good UX. Can be toggled with the
         # function
-        if self.require_new_face and self.displayed_face_encodings is not None and \
-                face_recognition.face_distance([enc], self.displayed_face_encodings) < SAME_FACE_ENCODINGS_TOLERANCE:
+        if self.require_new_face and self.displayed_fr_image is not None and \
+                face_recognition.face_distance([fr_image.largest_face_encodings()],
+                                               self.displayed_fr_image.largest_face_encodings()) \
+                < SAME_FACE_ENCODINGS_TOLERANCE:
             # Face too similar, probably the same person
-            debug_print.info('Face too similar to previous.')
+            self.last_fr_image = fr_image
+            debug_print.info('Found face too similar to displayed face. Settings require a likely new person.')
             return None
         dft.time_action('face_distances')
-        self.last_face_encodings = enc
-        self.displayed_face_encodings = enc
+        self.last_fr_image = fr_image
+        self.displayed_fr_image = fr_image
         # Crop, draw, and return face.
-        return self.__crop_face_to_epd(img, face).convert('1')
+        return self.__crop_face_to_epd(image, fr_image.largest_face_location()).convert('1')
 
     def change_require_new_face(self, require=None):
         """Toggles whether we require a new face outside of the tolerances before displaying.
@@ -127,26 +132,6 @@ class FaceFramer:
         stream.seek(0)
         return Image.open(stream)
 
-    def __largest_face_location_and_encodings(self, pil_image):
-        """Returns a tuple of the largest face location and its encoding or None if no face is found."""
-        cv_width = int(pil_image.width / FACIAL_RECOGNITION_IMAGE_SCALE)
-        cv_height = int(pil_image.height / FACIAL_RECOGNITION_IMAGE_SCALE)
-        numpy_image = numpy.array(pil_image.resize([cv_width, cv_height]))
-        face_locations = face_recognition.face_locations(numpy_image)
-        if len(face_locations) == 0:
-            return None, None
-
-        largest_face = self.__largest_bounding_box(face_locations)
-        face_encodings = face_recognition.face_encodings(numpy_image, known_face_locations=[largest_face])
-        if len(face_encodings) == 0:
-            return None, None
-
-        largest_face_rescaled = (int(largest_face[3] * FACIAL_RECOGNITION_IMAGE_SCALE),
-                                 int(largest_face[0] * FACIAL_RECOGNITION_IMAGE_SCALE),
-                                 int(largest_face[1] * FACIAL_RECOGNITION_IMAGE_SCALE),
-                                 int(largest_face[2] * FACIAL_RECOGNITION_IMAGE_SCALE))
-        return largest_face_rescaled, face_encodings[0]
-
     def __crop_face_to_epd(self, pil_image, face_location):
         """Crops the input PIL Image to fit the face at face_location to the EPD width and height."""
         w = self.epd_height  # Swap because we are looking at the face in portrait but the actual display is landscape.
@@ -177,8 +162,3 @@ class FaceFramer:
         return largest
 
 
-# Assumes all image sizes are equal to CAMERA resolutions.
-def horizontal_join_images(img1, img2):
-    new_image = Image.new('RGB', (CAMERA_WIDTH * 2, CAMERA_HEIGHT))
-    new_image.paste(img1, (0, 0))
-    new_image.paste(img2, (CAMERA_WIDTH, 0))

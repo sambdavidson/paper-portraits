@@ -7,38 +7,62 @@ import numpy
 
 
 class FaceRecognitionImage:
-    def __init__(self, numpy_image):
-        self.numpy_image = numpy_image
-        self.raw_face_locations = face_recognition._raw_face_locations(numpy_image)
+    def __init__(self, pil_image, scale):
+        self.pil_image = pil_image
+        self.cv_scale = scale
+        self.numpy_image = shrunken_numpy_image(pil_image, scale)
+        self.raw_face_locations = face_recognition._raw_face_locations(self.numpy_image)
+        self._largest_face_encoding = None
+        self._largest_face_location = None
 
-    def face_locations(self):
+    def faces_exist_in_image(self):
+        return len(self.raw_face_locations) > 0
+
+    def _face_locations(self):
         return [face_recognition._trim_css_to_bounds(face_recognition._rect_to_css(face.rect), self.numpy_image.shape)
                 for face in self.raw_face_locations]
 
     def face_encodings(self):
         pose_predictor = face_recognition.pose_predictor_5_point
         raw_landmarks = [pose_predictor(self.numpy_image, face_location) for face_location in self.raw_face_locations]
-        return [numpy.array(face_recognition.face_encoder.compute_face_descriptor(self.numpy_image, raw_landmark_set, 1)) for
+
+        self._largest_face_encoding = [numpy.array(face_recognition.face_encoder.compute_face_descriptor(self.numpy_image, raw_landmark_set, 1)) for
                 raw_landmark_set in raw_landmarks]
+        return self._largest_face_encoding
 
-    def n_biggest_face_locations(self, n):
-        if n < len(self.raw_face_locations):
+    def largest_face_location(self):
+        if len(self.raw_face_locations) == 0:
             return None
-        return sorted(self.face_locations(), key=box_area)[(-1*n):]
+        if self._largest_face_location is not None:
+            return self._largest_face_location
 
-    def n_biggest_face_encodings(self, n):
-        locations = [face_recognition._css_to_rect(face_location) for face_location in self.n_biggest_face_locations(n)]
+        l = sorted(self._face_locations(), key=box_area)[(-1):]
+
+        self._largest_face_location = (int(l[3] * self.cv_scale), int(l[0] * self.cv_scale),
+                                       int(l[1] * self.cv_scale), int(l[2] * self.cv_scale))
+        return self._largest_face_location
+
+
+    def largest_face_encodings(self):
+        if len(self.raw_face_locations) == 0:
+            return None
+        if self._largest_face_encoding is not None:
+            return self._largest_face_encoding
+
+        locations = [face_recognition._css_to_rect(face_location) for face_location in self.largest_face_location()]
         pose_predictor = face_recognition.pose_predictor_5_point
         raw_landmarks = [pose_predictor(self.numpy_image, face_location) for face_location in locations]
-        return [
+        self._largest_face_encoding = [
             numpy.array(face_recognition.face_encoder.compute_face_descriptor(self.numpy_image, raw_landmark_set, 1))
             for
             raw_landmark_set in raw_landmarks]
+        return self._largest_face_encoding
 
-    def biggest_two_face_distance(self):
-        encodings = self.n_biggest_face_encodings(2)
 
-        return face_recognition.face_distance(encodings[0], encodings[1])
+def shrunken_numpy_image(pil_image, scale):
+    cv_width = int(pil_image.width / scale)
+    cv_height = int(pil_image.height / scale)
+    return numpy.array(pil_image.resize([cv_width, cv_height]))
 
 
 def box_area(box):
