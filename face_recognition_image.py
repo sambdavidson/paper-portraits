@@ -40,9 +40,7 @@ class FaceRecognitionImage:
             return None
         if self._largest_face_location is not None:
             return self._largest_face_location
-
         loc = sorted(self._face_locations(), key=box_area)[-1]
-
         self._largest_face_location = (int(loc[3] * self.cv_scale), int(loc[0] * self.cv_scale),
                                        int(loc[1] * self.cv_scale), int(loc[2] * self.cv_scale))
         return self._largest_face_location
@@ -53,13 +51,14 @@ class FaceRecognitionImage:
         if self._largest_face_encoding is not None:
             return self._largest_face_encoding
 
-        locations = [api._css_to_rect(face_location) for face_location in self.largest_face_location()]
+        locations = [api._css_to_rect(self.largest_face_location())]
         pose_predictor = api.pose_predictor_5_point
         raw_landmarks = [pose_predictor(self.numpy_image, face_location) for face_location in locations]
+        
         self._largest_face_encoding = [
             numpy.array(api.face_encoder.compute_face_descriptor(self.numpy_image, raw_landmark_set, 1))
             for
-            raw_landmark_set in raw_landmarks]
+            raw_landmark_set in raw_landmarks][0]
         return self._largest_face_encoding
 
 
