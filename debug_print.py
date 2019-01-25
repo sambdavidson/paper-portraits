@@ -14,5 +14,4 @@ def info(v):
 
 
 def error(v):
-    if debug_mode:
-        print('ERROR[{}]: {}'.format(time.strftime("%H:%M:%S", time.gmtime()), v))
+    print('ERROR[{}]: {}'.format(time.strftime("%H:%M:%S", time.gmtime()), v))
