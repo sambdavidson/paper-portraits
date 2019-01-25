@@ -20,13 +20,13 @@ class FaceRecognitionImage:
 
     def _face_locations(self):
         if not self.faces_exist_in_image():
-            return []
+            return None
         return [api._trim_css_to_bounds(api._rect_to_css(face), self.numpy_image.shape)
                 for face in self.raw_face_locations]
 
     def face_encodings(self):
         if not self.faces_exist_in_image():
-            return []
+            return None
 
         pose_predictor = api.pose_predictor_5_point
         raw_landmarks = [pose_predictor(self.numpy_image, face_location) for face_location in self.raw_face_locations]
@@ -45,7 +45,7 @@ class FaceRecognitionImage:
                                        int(loc[1] * self.cv_scale), int(loc[2] * self.cv_scale))
         return self._largest_face_location
 
-    def largest_face_encoding(self):
+    def largest_face_encodings(self):
         if not self.faces_exist_in_image():
             return None
         if self._largest_face_encoding is not None:
