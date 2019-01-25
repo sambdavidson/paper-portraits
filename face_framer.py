@@ -72,8 +72,8 @@ class FaceFramer:
         # A short distance means the same person stared for a long while AND the photo wasn't very blurry.
         # A large distance means its either a different person or one photo was blurry and gave bad encodings.
         if self.require_two_same_face and \
-                face_recognition.face_distance([fr_image.largest_face_encodings()],
-                                               self.last_fr_image.largest_face_encodings()) \
+                face_recognition.face_distance([fr_image.largest_face_encoding()],
+                                               [self.last_fr_image.largest_face_encoding()]) \
                 > SAME_FACE_ENCODINGS_TOLERANCE:
             self.last_fr_image = fr_image
             debug_print.info('Last two faces were likely different. Settings require them to likely match.')
@@ -84,8 +84,8 @@ class FaceFramer:
         # someone new comes along. I think it is up the context on whether this is a good UX. Can be toggled with the
         # function
         if self.require_new_face and self.displayed_fr_image is not None and \
-                face_recognition.face_distance([fr_image.largest_face_encodings()],
-                                               self.displayed_fr_image.largest_face_encodings()) \
+                face_recognition.face_distance([fr_image.largest_face_encoding()],
+                                               self.displayed_fr_image.largest_face_encoding()) \
                 < SAME_FACE_ENCODINGS_TOLERANCE:
             # Face too similar, probably the same person
             self.last_fr_image = fr_image
