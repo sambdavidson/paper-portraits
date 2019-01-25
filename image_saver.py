@@ -61,7 +61,9 @@ def save_to_google_cloud(image_name, image_path):
 def has_internet_access():
     try:
         socket.create_connection(("www.google.com", 80))
+        print('We have internet')
         return True
     except OSError:
         pass
+    print('No internet')
     return False
