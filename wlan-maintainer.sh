@@ -1,7 +1,7 @@
 #!/bin/bash
 
 MY_PATH="`dirname \"$0\"`"              # relative
-LOG_PATH="`( cd \"$MY_PATH\" && cd .. && pwd )`/log/network.log"
+LOG_PATH="`( cd \"$MY_PATH\" && cd .. && pwd )`/network.log"
 now=$(date +"%m-%d %r")
 
 # Which Interface do you want to check
@@ -11,7 +11,7 @@ pingip='google.com'
 
 while true;
 do
-	sleep 5m
+	sleep 1m
 	# Perform the network check and reset if necessary
 	/bin/ping -c 2 -I $wlan $pingip > /dev/null 2> /dev/null
 	if [ $? -ge 1 ] ; then
@@ -19,7 +19,5 @@ do
 	    /sbin/ifdown $wlan
 	    sleep 5
 	    /sbin/ifup --force $wlan
-	else
-	    echo "$now Network is UP. Just exit the program." >> $LOG_PATH
 	fi
 done
