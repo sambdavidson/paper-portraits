@@ -2,6 +2,17 @@
 Photo frame with a display, camera, and raspberry pi.
 
 ### Setup
+If the Pi doesn't have git yet, install it.
+```bash
+sudo apt-get install git
+```
+
+Then clone the repository locally and CD into it.
+```bash
+git clone ...repo url from github...
+cd paper-portraits
+```
+
 Decent chance it breaks midway through. If that happen, see where it crashed in `setup.sh` and finish the setup from there.
 ```bash
 sudo ./setup.sh
