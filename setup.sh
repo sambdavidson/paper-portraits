@@ -32,12 +32,13 @@ printf "\tInstalling essential apt packages:\n"
 apt-get install -qq build-essential \
     cmake \
     gfortran \
-    git \
+    python3 \
+    vim \
     wget \
     curl \
     graphicsmagick \
     libgraphicsmagick1-dev \
-    libatlas-dev \
+    libatlas-base-dev \
     libavcodec-dev \
     libavformat-dev \
     libboost-all-dev \
