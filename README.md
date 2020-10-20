@@ -2,9 +2,9 @@
 Photo frame with a display, camera, and raspberry pi.
 
 ### Setup
-If the Pi doesn't have git yet, install it.
+Install some basics
 ```bash
-sudo apt-get install git
+sudo apt-get install git python3.7 vim
 ```
 
 Then clone the repository locally and CD into it.
